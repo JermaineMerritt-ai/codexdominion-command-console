@@ -1,5 +1,6 @@
 import { APP_MODE } from "@/lib/config";
 import * as seed from "./seed";
+import { demoStore } from "./demo-store";
 import type {
   AuditEvent,
   Decision,
@@ -42,40 +43,44 @@ export interface DataRepository {
   dashboardSeries(): Promise<DashboardSeries>;
 }
 
-/** Demo implementation — typed seed records, resolved immediately. */
+/**
+ * Demo implementation — reads from the mutable in-memory demo store (seeded
+ * from the typed seed layer). Live governance actions mutate this store so
+ * reads reflect changes during a session.
+ */
 export const seedRepository: DataRepository = {
   async organizations() {
-    return seed.organizations;
+    return demoStore.organizations;
   },
   async users() {
-    return seed.users;
+    return demoStore.users;
   },
   async policies() {
-    return seed.policies;
+    return demoStore.policies;
   },
   async workflows() {
-    return seed.workflows;
+    return demoStore.workflows;
   },
   async decisions() {
-    return seed.decisions;
+    return demoStore.decisions;
   },
   async evidencePacks() {
-    return seed.evidencePacks;
+    return demoStore.evidencePacks;
   },
   async vendors() {
-    return seed.vendors;
+    return demoStore.vendors;
   },
   async opportunities() {
-    return seed.opportunities;
+    return demoStore.opportunities;
   },
   async auditEvents() {
-    return seed.auditEvents;
+    return demoStore.auditEvents;
   },
   async notifications() {
-    return seed.notifications;
+    return demoStore.notifications;
   },
   async riskAssessments() {
-    return seed.riskAssessments;
+    return demoStore.riskAssessments;
   },
   async dashboardSeries() {
     return {

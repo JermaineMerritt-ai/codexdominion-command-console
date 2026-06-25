@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { PolicyActions } from "@/components/policies/policy-actions";
 import { getPolicies, getUsersById, nameOf } from "@/lib/data/queries";
 import { formatDate } from "@/lib/utils";
 
@@ -50,6 +51,7 @@ export default async function PoliciesPage() {
                 <th className="px-5 py-3">Rules</th>
                 <th className="px-5 py-3">Status</th>
                 <th className="px-5 py-3">Last Updated</th>
+                <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -74,6 +76,9 @@ export default async function PoliciesPage() {
                   </td>
                   <td className="px-5 py-3 whitespace-nowrap text-muted-foreground">
                     {formatDate(p.lastUpdated)}
+                  </td>
+                  <td className="px-5 py-3">
+                    <PolicyActions policyId={p.id} status={p.status} />
                   </td>
                 </tr>
               ))}

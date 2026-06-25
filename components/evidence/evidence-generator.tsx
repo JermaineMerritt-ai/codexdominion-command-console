@@ -10,7 +10,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { generateEvidencePackRecord } from "@/lib/actions/governance";
 import type { Decision } from "@/types";
 import { formatDateTime } from "@/lib/utils";
 
@@ -37,12 +39,39 @@ export function EvidenceGenerator({ decisions }: Props) {
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
   const [step, setStep] = React.useState(0);
   const [hash, setHash] = React.useState("");
+  const [title, setTitle] = React.useState("Examination Evidence Pack");
+  const [saving, setSaving] = React.useState(false);
+  const [savedId, setSavedId] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
 
   function reset() {
     setPhase("select");
     setSelected(new Set());
     setStep(0);
     setHash("");
+    setTitle("Examination Evidence Pack");
+    setSaving(false);
+    setSavedId(null);
+    setError(null);
+  }
+
+  function saveRecord() {
+    setSaving(true);
+    setError(null);
+    generateEvidencePackRecord({
+      title,
+      decisionIds: [...selected],
+      formats: ["JSON", "PDF"],
+    })
+      .then((res) => {
+        if (res.ok) {
+          const pack = res.data as { id: string };
+          setSavedId(pack.id);
+        } else {
+          setError(res.error);
+        }
+      })
+      .finally(() => setSaving(false));
   }
 
   function toggle(id: string) {
@@ -131,6 +160,15 @@ export function EvidenceGenerator({ decisions }: Props) {
             <div className="max-h-[70vh] overflow-y-auto p-5">
               {phase === "select" && (
                 <>
+                  <label className="mb-1 block text-xs font-medium text-muted-foreground">
+                    Pack title
+                  </label>
+                  <Input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="mb-3"
+                    placeholder="Examination Evidence Pack"
+                  />
                   <p className="mb-3 text-sm text-muted-foreground">
                     Select the decisions to seal into a tamper-evident evidence
                     pack for examination or audit.
@@ -204,6 +242,14 @@ export function EvidenceGenerator({ decisions }: Props) {
                   <div className="mx-auto mt-4 max-w-md break-all rounded-md border bg-muted/40 p-3 font-mono text-xs">
                     {hash}
                   </div>
+                  {savedId && (
+                    <p className="mt-3 inline-flex items-center gap-1 text-sm text-success">
+                      <ShieldCheck className="h-4 w-4" /> Saved as record {savedId}
+                    </p>
+                  )}
+                  {error && (
+                    <p className="mt-3 text-sm text-destructive">{error}</p>
+                  )}
                 </div>
               )}
             </div>
@@ -231,8 +277,19 @@ export function EvidenceGenerator({ decisions }: Props) {
                     <Button size="sm" variant="outline" onClick={downloadJson}>
                       <Download className="h-4 w-4" /> Download JSON
                     </Button>
+                    {!savedId && (
+                      <Button size="sm" onClick={saveRecord} disabled={saving}>
+                        {saving ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <ShieldCheck className="h-4 w-4" />
+                        )}
+                        Save as record
+                      </Button>
+                    )}
                     <Button
                       size="sm"
+                      variant={savedId ? "default" : "ghost"}
                       onClick={() => {
                         setOpen(false);
                         reset();

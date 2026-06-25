@@ -6,6 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { WorkflowActions } from "@/components/workflows/workflow-actions";
 import { getUsersById, getWorkflows, nameOf } from "@/lib/data/queries";
 import { formatDateTime } from "@/lib/utils";
 import type { WorkflowState } from "@/types";
@@ -131,6 +132,8 @@ export default async function WorkflowsPage() {
                   </li>
                 ))}
               </ol>
+
+              <WorkflowActions workflowId={w.id} state={w.state} />
             </CardContent>
           </Card>
         ))}

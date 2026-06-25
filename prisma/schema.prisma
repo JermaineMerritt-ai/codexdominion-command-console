@@ -253,6 +253,13 @@ model AuditEvent {
   hash           String
   prevHash       String
   at             DateTime     @default(now())
+  // Structured mutation context (populated by live governance actions).
+  action         String?
+  entityType     String?
+  entityId       String?
+  beforeState    Json?
+  afterState     Json?
+  evidenceHash   String?
   organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
   actor          User         @relation(fields: [actorId], references: [id])

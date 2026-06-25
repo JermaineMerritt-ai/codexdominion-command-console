@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { VendorActions } from "@/components/vendors/vendor-actions";
 import { getUsersById, getVendors, nameOf } from "@/lib/data/queries";
 import { formatDate } from "@/lib/utils";
 import type { ComplianceState } from "@/types";
@@ -79,6 +80,7 @@ export default async function VendorsPage() {
                 <th className="px-5 py-3 text-center">FedRAMP</th>
                 <th className="px-5 py-3">Contract</th>
                 <th className="px-5 py-3">Status</th>
+                <th className="px-5 py-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -134,6 +136,11 @@ export default async function VendorsPage() {
                     </td>
                     <td className="px-5 py-3">
                       <StatusBadge status={v.status} />
+                    </td>
+                    <td className="px-5 py-3">
+                      <div className="flex justify-end">
+                        <VendorActions vendorId={v.id} status={v.status} />
+                      </div>
                     </td>
                   </tr>
                 );

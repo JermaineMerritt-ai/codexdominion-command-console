@@ -4,6 +4,7 @@ import * as React from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { DecisionActions } from "@/components/decisions/decision-actions";
 import { formatDateTime, shortHash } from "@/lib/utils";
 import type { Decision } from "@/types";
 
@@ -109,6 +110,12 @@ export function DecisionsTable({ data }: { data: DecisionRow[] }) {
               Hash-chained and tamper-evident. Included in the decision&apos;s
               evidence pack for examination.
             </p>
+          </div>
+          <div className="md:col-span-3 border-t pt-3">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Reviewer Action
+            </p>
+            <DecisionActions decisionId={d.id} outcome={d.outcome} />
           </div>
         </div>
       )}

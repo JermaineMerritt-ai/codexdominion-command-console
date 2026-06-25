@@ -53,6 +53,7 @@ export type AuditEventType =
   | "decision.denied"
   | "decision.escalated"
   | "policy.published"
+  | "policy.archived"
   | "policy.updated"
   | "approval.granted"
   | "approval.rejected"
@@ -60,6 +61,14 @@ export type AuditEventType =
   | "vendor.reviewed"
   | "workflow.transitioned"
   | "user.role_changed";
+
+/** Entity a mutation/audit event targets. */
+export type AuditEntityType =
+  | "decision"
+  | "workflow"
+  | "policy"
+  | "vendor"
+  | "evidence_pack";
 
 export interface Organization {
   id: string;
@@ -167,6 +176,13 @@ export interface AuditEvent {
   hash: string;
   prevHash: string;
   at: string;
+  // Structured mutation context (populated by live governance actions).
+  action?: string;
+  entityType?: AuditEntityType;
+  entityId?: string;
+  beforeState?: Record<string, unknown> | null;
+  afterState?: Record<string, unknown> | null;
+  evidenceHash?: string;
 }
 
 export interface Vendor {

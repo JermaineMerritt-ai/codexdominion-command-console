@@ -46,6 +46,26 @@ The console runs **zero-config** in **DEMO mode**. With no environment variables
 it serves a rich, typed **seed-data layer** so every screen is immediately
 demoable — ideal for enterprise pilot demonstrations and public previews.
 
+## ⚙️ Live governance actions
+
+The console is **operational**, not read-only. Every action runs as a validated
+**server action**, mutates state, and writes a **hash-chained audit event**.
+
+| Action | Where | Audit event |
+| --- | --- | --- |
+| Approve / Deny decision | Decisions → expand a row | `decision.approved` / `decision.denied` |
+| Transition workflow | Workflows → "Move to" | `workflow.transitioned` (invalid transitions rejected) |
+| Publish / Archive policy | Policies → row actions | `policy.published` / `policy.archived` |
+| Complete vendor review | Vendors → "Mark reviewed" | `vendor.reviewed` |
+| Save evidence pack record | Evidence → generator | `evidence.generated` |
+
+- **Demo mode:** mutations persist in an in-memory store and update the UI live
+  (reset on cold start — ideal for a shared public demo).
+- **Database mode:** mutations + audit events run in a single Prisma transaction.
+
+Inputs are validated with Zod; see [docs/audit-events.md](docs/audit-events.md)
+and [docs/sprint-02.md](docs/sprint-02.md). Run the action tests with `npm test`.
+
 ## 🔀 Data source modes
 
 A single switch (`NEXT_PUBLIC_APP_MODE`) selects where data comes from. Pages
@@ -80,6 +100,7 @@ See [docs/deployment.md](docs/deployment.md) and [docs/data-model.md](docs/data-
 | `npm run start` | Serve the production build |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
+| `npm test` | Run governance unit tests |
 | `npm run db:generate` | Generate the Prisma client |
 | `npm run db:push` | Push schema to the database |
 | `npm run db:migrate` | Create & apply a migration |
@@ -106,9 +127,10 @@ docs/           Architecture, data model, API, deployment, roadmap
 - [API & Server Actions](docs/api.md)
 - [Security](docs/security.md)
 - [Compliance Mapping](docs/compliance.md)
+- [Audit Events](docs/audit-events.md)
 - [Deployment](docs/deployment.md)
 - [Roadmap](docs/roadmap.md)
-- [Sprint 01](docs/sprint-01.md)
+- [Sprint 01](docs/sprint-01.md) · [Sprint 02](docs/sprint-02.md)
 - [Demo Script](docs/demo-script.md)
 - [Contributing](CONTRIBUTING.md)
 
