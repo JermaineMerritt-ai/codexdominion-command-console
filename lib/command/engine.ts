@@ -2,6 +2,7 @@ import type {
   AuditEvent,
   Decision,
   ProcurementOpportunity,
+  RiskLevel,
   Vendor,
   Workflow,
 } from "@/types";
@@ -21,11 +22,18 @@ export interface CommandResultBody {
   rows: CommandRow[];
   recommendedActions: string[];
   evidenceLinks: { label: string; href: string }[];
+  riskLevel?: RiskLevel;
+  nextStep?: string;
+  /** Multi-step plan for composite commands (orchestration view). */
+  plan?: string[];
 }
 
 /** Full result returned to the Command Workspace UI. */
 export interface CommandResult extends CommandResultBody {
   ok: boolean;
+  commandId: string;
+  provider: string;
+  providerLabel: string;
   intent: CommandIntent;
   intentLabel: string;
   entities: Record<string, string>;
@@ -208,6 +216,134 @@ export function runQuery(
         rows,
         recommendedActions: [],
         evidenceLinks: [{ label: "Open Audit Trail", href: "/settings" }],
+      };
+    }
+
+    case "prepare_buyer_demo_summary": {
+      const highRisk = data.decisions.filter(
+        (d) => d.riskLevel === "high" || d.riskLevel === "critical",
+      ).length;
+      const pending = data.workflows.filter(
+        (w) => w.state === "pending_review" || w.state === "escalated",
+      ).length;
+      const highRiskVendors = data.vendors.filter((v) => v.riskScore >= 60).length;
+      const strongOpps = data.opportunities.filter((o) => o.matchScore >= 80).length;
+      const rows: CommandRow[] = [
+        { id: "m1", title: "Total AI decisions governed", subtitle: String(data.decisions.length) },
+        { id: "m2", title: "High-risk decisions", subtitle: String(highRisk) },
+        { id: "m3", title: "Workflows awaiting review", subtitle: String(pending) },
+        { id: "m4", title: "High-risk vendors", subtitle: String(highRiskVendors) },
+        { id: "m5", title: "High-match opportunities", subtitle: String(strongOpps) },
+      ];
+      return {
+        summary: `Demo-ready: ${data.decisions.length} governed decisions, ${highRisk} high-risk, ${pending} awaiting review. The console demonstrates visibility → action → authority → governed command → proof.`,
+        rows,
+        plan: [
+          "Gather governance metrics",
+          "Summarize current posture",
+          "Outline the 5-minute buyer demo flow",
+        ],
+        recommendedActions: [
+          "Dashboard — governance visibility",
+          "Decisions — approve/deny an AI action",
+          "Command — run a governed command",
+          "Evidence — generate an audit pack",
+          "Vendors — show expiring compliance",
+        ],
+        evidenceLinks: [
+          { label: "Open Dashboard", href: "/dashboard" },
+          { label: "Demo script", href: "/dashboard" },
+        ],
+        riskLevel: "low",
+        nextStep: "Start the demo on the Dashboard, then run a command here.",
+      };
+    }
+
+    case "review_system_risk_posture": {
+      const critical = data.decisions.filter((d) => d.riskLevel === "critical");
+      const high = data.decisions.filter((d) => d.riskLevel === "high");
+      const escalated = data.workflows.filter((w) => w.state === "escalated");
+      const riskyVendors = data.vendors.filter((v) => v.riskScore >= 60);
+      const level: RiskLevel =
+        critical.length || escalated.length
+          ? "critical"
+          : high.length || riskyVendors.length
+            ? "high"
+            : "low";
+      const rows: CommandRow[] = [
+        ...critical.map<CommandRow>((d) => ({
+          id: d.id,
+          title: `${d.aiSystem} — critical decision`,
+          subtitle: d.policyRule,
+          badge: "critical",
+          badgeStatus: "critical",
+          href: "/decisions",
+        })),
+        ...escalated.map<CommandRow>((w) => ({
+          id: w.id,
+          title: `${w.name} — escalated`,
+          subtitle: w.aiSystem,
+          badge: "escalated",
+          badgeStatus: "escalated",
+          href: "/workflows",
+        })),
+        ...riskyVendors.map<CommandRow>((v) => ({
+          id: v.id,
+          title: `${v.name} — high vendor risk`,
+          subtitle: `Risk score ${v.riskScore}`,
+          badge: v.status,
+          badgeStatus: v.status,
+          href: "/vendors",
+        })),
+      ];
+      return {
+        summary: `Overall posture: ${level.toUpperCase()}. ${critical.length} critical + ${high.length} high-risk decisions, ${escalated.length} escalated workflow(s), ${riskyVendors.length} high-risk vendor(s).`,
+        rows,
+        recommendedActions: rows.length
+          ? ["Resolve the highest-severity items first (critical, then escalated)."]
+          : ["Posture is healthy — no critical items open."],
+        evidenceLinks: [
+          { label: "Open Dashboard", href: "/dashboard" },
+          { label: "Open Decisions", href: "/decisions" },
+        ],
+        riskLevel: level,
+        nextStep: critical.length
+          ? `Review critical decision ${critical[0].id}.`
+          : escalated.length
+            ? `Resolve escalated workflow ${escalated[0].name}.`
+            : "Maintain current controls.",
+      };
+    }
+
+    case "recommend_next_governance_action": {
+      const escalated = data.workflows.find((w) => w.state === "escalated");
+      const flagged = data.decisions.find((d) => d.outcome === "flagged");
+      const expiring = expiringVendors(data.vendors, now)[0];
+      let nextStep: string;
+      let row: CommandRow | null = null;
+      let level: RiskLevel = "low";
+      if (escalated) {
+        nextStep = `Resolve escalated workflow "${escalated.name}".`;
+        row = { id: escalated.id, title: escalated.name, subtitle: escalated.aiSystem, badge: "escalated", badgeStatus: "escalated", href: "/workflows" };
+        level = "critical";
+      } else if (flagged) {
+        nextStep = `Review flagged decision ${flagged.id} and approve or deny it.`;
+        row = { id: flagged.id, title: flagged.aiSystem, subtitle: flagged.policyRule, badge: "flagged", badgeStatus: "flagged", href: "/decisions" };
+        level = "high";
+      } else if (expiring) {
+        nextStep = `Complete the vendor review for ${expiring.name}.`;
+        row = { id: expiring.id, title: expiring.name, subtitle: expiring.category, badge: expiring.status, badgeStatus: expiring.status, href: "/vendors" };
+        level = "medium";
+      } else {
+        nextStep = "Generate an evidence pack to stay audit-ready.";
+      }
+      return {
+        summary: `Recommended next action: ${nextStep}`,
+        rows: row ? [row] : [],
+        recommendedActions: [nextStep],
+        evidenceLinks: [],
+        riskLevel: level,
+        nextStep,
       };
     }
 

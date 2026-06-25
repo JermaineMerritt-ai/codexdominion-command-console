@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
 export default function Home() {
-  redirect("/dashboard");
+  // The Command Workspace is the primary interface for CodexDominion.
+  redirect("/command");
 }

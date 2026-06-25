@@ -1,8 +1,10 @@
 # Command Workspace
 
-The Command Workspace (`/command`) is a **governed command interface** — users
-describe what they want in natural language, and CodexDominion translates it into
-controlled, auditable governance operations.
+The Command Workspace (`/command`) is the **primary interface** for CodexDominion
+(`/` redirects here) — a **governed command interface** where users describe what
+they want in natural language, and CodexDominion translates it into controlled,
+auditable governance operations, then routes execution to a selected
+[AI provider](ai-provider-routing.md).
 
 > This is **not** a chatbot. It is a deterministic command engine: no LLM, no API
 > keys. Every interpretation is explainable, every execution is access-controlled
@@ -29,6 +31,9 @@ prompt
 | "Show procurement opportunities with high match scores" | `show_high_match_opportunities` | query |
 | "Explain why decision DEC-2026-0480 was denied" | `explain_decision` | query |
 | "Show audit events for DEC-2026-0480" | `show_audit_events` | query |
+| "Prepare a buyer demo summary" | `prepare_buyer_demo_summary` | query |
+| "Review system risk posture" | `review_system_risk_posture` | query |
+| "Recommend next governance action" | `recommend_next_governance_action` | query |
 | "Generate evidence pack for denied decisions" | `generate_evidence_for_denied` | `generate_evidence_pack` |
 
 Unrecognized prompts return a clear "unsupported" message — the engine never

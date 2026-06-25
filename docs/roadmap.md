@@ -27,7 +27,25 @@
 - SAM.gov / opportunity ingestion for procurement
 - Notification delivery (email / Slack / webhook)
 
-## 🧭 Vision — Command Workspace (natural-language control plane)
+## 🧭 Command Workspace — ✅ delivered (Sprints 04–05)
+
+The Command Workspace shipped as the **primary interface** (`/command`, now the
+home screen) with a deterministic governed command engine (Sprint 04) and an
+**AI provider abstraction** (Sprint 05): CodexDominion governs every request and
+routes execution to interchangeable providers (Codex active; Claude/ChatGPT/
+Copilot preview). See [command-workspace.md](command-workspace.md) and
+[ai-provider-routing.md](ai-provider-routing.md).
+
+### Proposed forward sequence
+- **Sprint 06** — Real provider integration (Claude/ChatGPT) behind the abstraction
+- **Sprint 07** — Multi-step plan execution (run each planned intent, governed)
+- **Sprint 08** — Module Registry (ComplianceFlow, GrantOps, EscrowFlow, …)
+- **Sprint 09** — Live integration with `codex-control-plane`
+- **Sprint 10** — Multi-organization (tenants / workspaces)
+- **Sprint 11** — Enterprise SSO (Entra ID, Okta) + SCIM
+- **Sprint 12** — Research provider integration
+
+### Original vision (reference)
 
 Evolve the console from page navigation to a **governed command interface**. A
 top-level **Command** page with a prompt bar where users describe intent:

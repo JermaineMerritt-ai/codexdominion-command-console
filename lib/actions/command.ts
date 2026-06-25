@@ -11,14 +11,40 @@ import {
 } from "@/lib/data/queries";
 import { getMutations } from "@/lib/data/mutations";
 import { can, forbiddenMessage } from "@/lib/governance/rbac";
+import { computeEvidenceHash } from "@/lib/governance/audit";
 import { parseCommand } from "@/lib/command/intents";
-import { deniedDecisions, runQuery, type CommandResult } from "@/lib/command/engine";
+import {
+  deniedDecisions,
+  runQuery,
+  type CommandData,
+  type CommandResult,
+} from "@/lib/command/engine";
+import { getProvider } from "@/lib/providers/registry";
 
-/** Execute a Command Workspace prompt: parse → authorize → run → audit. */
-export async function executeCommand(prompt: string): Promise<CommandResult> {
+function makeCommandId(prompt: string, providerId: string, intent: string): string {
+  return (
+    "CMD-" +
+    computeEvidenceHash({ prompt, providerId, intent }).slice(2, 10).toUpperCase()
+  );
+}
+
+/**
+ * Execute a Command Workspace prompt. CodexDominion governs the request first
+ * (parse → RBAC → audit), then routes execution to the selected provider.
+ * Codex is always the governing layer; other providers are execution assistants.
+ */
+export async function executeCommand(
+  prompt: string,
+  providerId = "codex",
+): Promise<CommandResult> {
   const parsed = parseCommand(prompt);
+  const provider = getProvider(providerId);
+  const commandId = makeCommandId(prompt, provider.id, parsed.intent);
 
   const base = {
+    commandId,
+    provider: provider.id,
+    providerLabel: provider.name,
     intent: parsed.intent,
     intentLabel: parsed.label,
     entities: parsed.entities,
@@ -29,26 +55,27 @@ export async function executeCommand(prompt: string): Promise<CommandResult> {
     return {
       ...base,
       ok: false,
-      error:
-        "I can't interpret that yet. Try one of the suggested prompts below.",
+      error: "I can't interpret that yet. Try one of the suggested prompts below.",
       summary: "Unsupported command.",
       rows: [],
       recommendedActions: [],
       evidenceLinks: [],
+      riskLevel: "low",
       auditEventId: null,
     };
   }
 
   const actor = await getCurrentActor();
+  const mutations = await getMutations();
 
-  // RBAC: privileged commands require a governance permission.
+  // CodexDominion RBAC — enforced before any provider routing.
   if (parsed.permission && !can(actor.role, parsed.permission)) {
     try {
-      await (await getMutations()).auditAuthorizationDenied(
+      await mutations.auditAuthorizationDenied(
         actor,
         `command:${parsed.intent}`,
         "command",
-        parsed.intent,
+        commandId,
       );
       revalidatePath("/settings");
     } catch {
@@ -62,6 +89,7 @@ export async function executeCommand(prompt: string): Promise<CommandResult> {
       rows: [],
       recommendedActions: [],
       evidenceLinks: [],
+      riskLevel: "low",
       auditEventId: null,
     };
   }
@@ -74,43 +102,64 @@ export async function executeCommand(prompt: string): Promise<CommandResult> {
       getOpportunities(),
       getAuditEvents(),
     ]);
+  const data: CommandData = { decisions, workflows, vendors, opportunities, auditEvents };
 
-  const mutations = await getMutations();
-
-  // Privileged command: generate an evidence pack for denied decisions.
-  if (parsed.intent === "generate_evidence_for_denied") {
-    const denied = deniedDecisions(decisions);
-    if (denied.length === 0) {
-      const audit = await mutations.recordCommandAudit(actor, {
-        intent: parsed.intent,
-        prompt: parsed.prompt,
-        summary: "No denied decisions to package.",
-        afterState: { intent: parsed.intent, packaged: 0 },
-      });
-      revalidatePath("/settings");
-      return {
-        ...base,
-        ok: true,
-        summary: "No denied decisions found — nothing to package.",
-        rows: [],
-        recommendedActions: [],
-        evidenceLinks: [],
-        auditEventId: audit.id,
-      };
-    }
-    const pack = await mutations.generateEvidencePackRecord(
-      {
-        title: `Denied Decisions Evidence Pack (${denied.length})`,
-        decisionIds: denied.map((d) => d.id),
-        formats: ["JSON", "PDF"],
-      },
-      actor,
-    );
+  // Provider not connected → governed, parsed, audited, but not executed.
+  if (!provider.connected) {
+    const exec = await provider.executeCommand({ parsed, data, now: new Date() });
     const audit = await mutations.recordCommandAudit(actor, {
       intent: parsed.intent,
       prompt: parsed.prompt,
-      summary: `Sealed ${pack.id} covering ${denied.length} denied decisions.`,
-      afterState: { intent: parsed.intent, packId: pack.id, packaged: denied.length },
+      summary: `Routed to ${provider.name} (not connected).`,
+      afterState: { intent: parsed.intent, provider: provider.id, executed: false },
+    });
+    revalidatePath("/settings");
+    return {
+      ...base,
+      ok: true,
+      summary: exec.notice ?? `${provider.name} is not connected yet.`,
+      rows: [],
+      recommendedActions: [],
+      evidenceLinks: [],
+      riskLevel: "low",
+      nextStep: `Connect ${provider.name} to enable execution.`,
+      auditEventId: audit.id,
+    };
+  }
+
+  // Codex (connected): governed mutation for evidence; otherwise provider query.
+  if (parsed.intent === "generate_evidence_for_denied") {
+    const denied = deniedDecisions(decisions);
+    const summary = denied.length
+      ? `Sealed an evidence pack covering ${denied.length} denied decision${denied.length === 1 ? "" : "s"}.`
+      : "No denied decisions found — nothing to package.";
+    let evidenceLinks: { label: string; href: string }[] = [];
+    let rows = denied.map((d) => ({
+      id: d.id,
+      title: d.aiSystem,
+      subtitle: d.policyRule,
+      badge: "denied",
+      badgeStatus: "denied",
+      href: "/evidence",
+    }));
+    if (denied.length) {
+      const pack = await mutations.generateEvidencePackRecord(
+        {
+          title: `Denied Decisions Evidence Pack (${denied.length})`,
+          decisionIds: denied.map((d) => d.id),
+          formats: ["JSON", "PDF"],
+        },
+        actor,
+      );
+      evidenceLinks = [{ label: `Evidence pack ${pack.id}`, href: "/evidence" }];
+    } else {
+      rows = [];
+    }
+    const audit = await mutations.recordCommandAudit(actor, {
+      intent: parsed.intent,
+      prompt: parsed.prompt,
+      summary,
+      afterState: { intent: parsed.intent, provider: provider.id, packaged: denied.length },
     });
     revalidatePath("/evidence");
     revalidatePath("/dashboard");
@@ -118,40 +167,38 @@ export async function executeCommand(prompt: string): Promise<CommandResult> {
     return {
       ...base,
       ok: true,
-      summary: `Sealed evidence pack ${pack.id} covering ${denied.length} denied decision${denied.length === 1 ? "" : "s"}.`,
-      rows: denied.map((d) => ({
-        id: d.id,
-        title: d.aiSystem,
-        subtitle: d.policyRule,
-        badge: "denied",
-        badgeStatus: "denied",
-        href: "/evidence",
-      })),
-      recommendedActions: ["Distribute the sealed pack to examiners or auditors."],
-      evidenceLinks: [
-        { label: `Evidence pack ${pack.id}`, href: "/evidence" },
-      ],
+      summary,
+      rows,
+      recommendedActions: denied.length
+        ? ["Distribute the sealed pack to examiners or auditors."]
+        : [],
+      evidenceLinks,
+      riskLevel: denied.length ? "medium" : "low",
+      nextStep: denied.length ? "Open Evidence to export the pack." : undefined,
       auditEventId: audit.id,
     };
   }
 
-  // Read-only commands.
-  const body = runQuery(
-    parsed,
-    { decisions, workflows, vendors, opportunities, auditEvents },
-    new Date(),
-  );
+  const exec = await provider.executeCommand({ parsed, data, now: new Date() });
+  const body = exec.body!;
   const audit = await mutations.recordCommandAudit(actor, {
     intent: parsed.intent,
     prompt: parsed.prompt,
     summary: body.summary,
     afterState: {
       intent: parsed.intent,
-      entities: parsed.entities,
+      provider: provider.id,
       resultCount: body.rows.length,
+      riskLevel: body.riskLevel ?? "low",
     },
   });
   revalidatePath("/settings");
 
-  return { ...base, ok: true, ...body, auditEventId: audit.id };
+  return {
+    ...base,
+    ok: true,
+    ...body,
+    riskLevel: body.riskLevel ?? "low",
+    auditEventId: audit.id,
+  };
 }

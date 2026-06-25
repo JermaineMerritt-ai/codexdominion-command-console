@@ -9,6 +9,9 @@ export type CommandIntent =
   | "show_high_match_opportunities"
   | "explain_decision"
   | "show_audit_events"
+  | "prepare_buyer_demo_summary"
+  | "review_system_risk_posture"
+  | "recommend_next_governance_action"
   | "unsupported";
 
 export interface IntentDefinition {
@@ -80,6 +83,31 @@ export const INTENT_DEFINITIONS: IntentDefinition[] = [
       /high[\s-]?match/i,
     ],
     sample: "Show procurement opportunities with high match scores",
+  },
+  {
+    intent: "prepare_buyer_demo_summary",
+    label: "Prepare buyer demo summary",
+    permission: null,
+    patterns: [/buyer\s+demo/i, /demo\s+summary/i, /prepare.*demo/i],
+    sample: "Prepare a buyer demo summary",
+  },
+  {
+    intent: "review_system_risk_posture",
+    label: "Review system risk posture",
+    permission: null,
+    patterns: [/risk\s+posture/i, /review.*risk/i, /system\s+risk/i],
+    sample: "Review system risk posture",
+  },
+  {
+    intent: "recommend_next_governance_action",
+    label: "Recommend next governance action",
+    permission: null,
+    patterns: [
+      /recommend.*(next|action|governance)/i,
+      /next\s+(governance\s+)?action/i,
+      /what\s+should\s+i\s+do/i,
+    ],
+    sample: "Recommend next governance action",
   },
 ];
 

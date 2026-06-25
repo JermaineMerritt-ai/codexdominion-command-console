@@ -32,7 +32,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         )}
       >
         <div className="flex h-16 items-center justify-between border-b px-5">
-          <Link href="/dashboard" className="flex items-center gap-2.5">
+          <Link href="/command" className="flex items-center gap-2.5">
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <ShieldCheck className="h-5 w-5" />
             </div>

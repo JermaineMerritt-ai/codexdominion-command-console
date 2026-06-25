@@ -46,12 +46,15 @@ The console runs **zero-config** in **DEMO mode**. With no environment variables
 it serves a rich, typed **seed-data layer** so every screen is immediately
 demoable — ideal for enterprise pilot demonstrations and public previews.
 
-## 🧭 Command Workspace
+## 🧭 Command Workspace (the home screen)
 
-`/command` is a **governed command interface** — describe what you need in plain
-language and CodexDominion interprets it, enforces governance, executes, and
-audits. It's **deterministic** (no LLM / API keys): every command is explainable
-and access-controlled.
+`/command` is the **primary interface** (`/` redirects here) — a **governed
+command interface** where you describe what you need in plain language.
+CodexDominion **governs every request** (parse → RBAC → audit), then **routes
+execution to a selected AI provider**. It's deterministic today (no LLM / API
+keys); providers are interchangeable execution assistants behind the governed
+pipeline. **CodexDominion is always the governing layer** — see
+[AI provider routing](docs/ai-provider-routing.md).
 
 ```
 Show high-risk decisions
@@ -60,6 +63,9 @@ Show vendors with expiring certifications
 Show procurement opportunities with high match scores
 Explain why decision DEC-2026-0480 was denied
 Show audit events for DEC-2026-0480
+Prepare a buyer demo summary
+Review system risk posture
+Recommend next governance action
 Generate evidence pack for denied decisions   (requires evidence permission)
 ```
 
@@ -174,10 +180,10 @@ docs/           Architecture, data model, API, deployment, roadmap
 - [Authentication](docs/auth.md) · [RBAC](docs/rbac.md)
 - [Compliance Mapping](docs/compliance.md)
 - [Audit Events](docs/audit-events.md)
-- [Command Workspace](docs/command-workspace.md)
+- [Command Workspace](docs/command-workspace.md) · [AI Provider Routing](docs/ai-provider-routing.md)
 - [Deployment](docs/deployment.md)
 - [Roadmap](docs/roadmap.md)
-- [Sprint 01](docs/sprint-01.md) · [Sprint 02](docs/sprint-02.md) · [Sprint 03](docs/sprint-03.md) · [Sprint 04](docs/sprint-04.md)
+- [Sprint 01](docs/sprint-01.md) · [02](docs/sprint-02.md) · [03](docs/sprint-03.md) · [04](docs/sprint-04.md) · [05](docs/sprint-05.md)
 - [Demo Script](docs/demo-script.md)
 - [Contributing](CONTRIBUTING.md)
 

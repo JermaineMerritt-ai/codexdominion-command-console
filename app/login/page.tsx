@@ -32,7 +32,7 @@ export default function LoginPage() {
       setError(error.message);
       return;
     }
-    router.push("/dashboard");
+    router.push("/command");
     router.refresh();
   }
 
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
           {!REQUIRE_AUTH && (
             <Link
-              href="/dashboard"
+              href="/command"
               className="mt-4 inline-flex w-full items-center justify-center gap-1 text-sm font-medium text-primary hover:underline"
             >
               Continue to demo <ArrowRight className="h-3.5 w-3.5" />
