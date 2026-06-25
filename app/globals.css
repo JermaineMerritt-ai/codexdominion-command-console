@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 24% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 24% 11%;
+
+    --primary: 221 70% 38%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 25% 95%;
+    --secondary-foreground: 222 24% 18%;
+
+    --muted: 215 25% 96%;
+    --muted-foreground: 215 14% 42%;
+
+    --accent: 215 28% 94%;
+    --accent-foreground: 222 24% 18%;
+
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 56% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 35 92% 45%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 215 20% 88%;
+    --input: 215 20% 88%;
+    --ring: 221 70% 45%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222 32% 8%;
+    --foreground: 213 31% 92%;
+
+    --card: 222 28% 11%;
+    --card-foreground: 213 31% 92%;
+
+    --primary: 213 78% 62%;
+    --primary-foreground: 222 32% 8%;
+
+    --secondary: 217 24% 17%;
+    --secondary-foreground: 213 31% 92%;
+
+    --muted: 217 24% 15%;
+    --muted-foreground: 215 18% 62%;
+
+    --accent: 217 24% 18%;
+    --accent-foreground: 213 31% 92%;
+
+    --destructive: 0 63% 56%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 152 50% 48%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 90% 56%;
+    --warning-foreground: 222 32% 8%;
+
+    --border: 217 22% 20%;
+    --input: 217 22% 22%;
+    --ring: 213 78% 62%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--border));
+    border-radius: 9999px;
+  }
+}
+
+.skeleton {
+  @apply relative overflow-hidden bg-muted;
+}
+.skeleton::after {
+  content: "";
+  @apply absolute inset-0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    hsl(var(--accent) / 0.6),
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

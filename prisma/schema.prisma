@@ -1,0 +1,326 @@
+// CodexDominion Command Console — Prisma schema
+// Production data model for the AI Governance Control Plane.
+// The app runs zero-config on a seed layer; wire this to Supabase
+// Postgres for production pilots (see .env.example + docs/Database.md).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Sector {
+  enterprise
+  healthcare
+  finance
+  government
+}
+
+enum OrgTier {
+  pilot
+  standard
+  enterprise
+}
+
+enum UserRole {
+  administrator
+  compliance_officer
+  reviewer
+  auditor
+  executive
+  viewer
+}
+
+enum UserStatus {
+  active
+  invited
+  suspended
+}
+
+enum RiskLevel {
+  low
+  medium
+  high
+  critical
+}
+
+enum PolicyStatus {
+  published
+  draft
+  archived
+}
+
+enum WorkflowState {
+  draft
+  pending_review
+  approved
+  denied
+  escalated
+  closed
+}
+
+enum DecisionOutcome {
+  approved
+  denied
+  flagged
+  escalated
+}
+
+enum ApprovalStatus {
+  pending
+  approved
+  denied
+}
+
+enum ComplianceState {
+  compliant
+  pending
+  expired
+  not_applicable
+}
+
+enum VendorStatus {
+  approved
+  under_review
+  denied
+  expiring
+}
+
+enum OpportunityStatus {
+  tracking
+  qualifying
+  bid
+  submitted
+  won
+  lost
+  no_bid
+}
+
+enum PackStatus {
+  generated
+  generating
+  archived
+}
+
+model Organization {
+  id            String                  @id @default(cuid())
+  name          String
+  sector        Sector
+  tier          OrgTier                 @default(pilot)
+  createdAt     DateTime                @default(now())
+  users         User[]
+  policies      Policy[]
+  workflows     Workflow[]
+  decisions     Decision[]
+  evidencePacks EvidencePack[]
+  vendors       Vendor[]
+  opportunities ProcurementOpportunity[]
+  auditEvents   AuditEvent[]
+  settings      OrganizationSettings?
+}
+
+model User {
+  id             String       @id @default(cuid())
+  authId         String?      @unique // Supabase auth.users.id
+  name           String
+  email          String       @unique
+  role           UserRole     @default(viewer)
+  title          String?
+  status         UserStatus   @default(active)
+  avatarColor    String       @default("#2563eb")
+  lastActiveAt   DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+
+  ownedPolicies   Policy[]
+  ownedWorkflows  Workflow[]
+  reviewedDecisions Decision[]
+  approvals       Approval[]
+  evidencePacks   EvidencePack[]
+  ownedVendors    Vendor[]
+  auditEvents     AuditEvent[]
+
+  @@index([organizationId])
+}
+
+model Policy {
+  id             String       @id @default(cuid())
+  name           String
+  category       String
+  version        String
+  status         PolicyStatus @default(draft)
+  description    String
+  rulesCount     Int          @default(0)
+  lastUpdated    DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  owner          User         @relation(fields: [ownerId], references: [id])
+  ownerId        String
+
+  @@index([organizationId])
+}
+
+model Workflow {
+  id             String          @id @default(cuid())
+  name           String
+  aiSystem       String
+  state          WorkflowState   @default(draft)
+  riskLevel      RiskLevel       @default(medium)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  organizationId String
+  owner          User            @relation(fields: [ownerId], references: [id])
+  ownerId        String
+  decisions      Decision[]
+  events         WorkflowEvent[]
+
+  @@index([organizationId])
+}
+
+model WorkflowEvent {
+  id         String        @id @default(cuid())
+  state      WorkflowState
+  actorId    String
+  note       String?
+  at         DateTime      @default(now())
+  workflow   Workflow      @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  workflowId String
+
+  @@index([workflowId])
+}
+
+model Decision {
+  id             String          @id @default(cuid())
+  aiSystem       String
+  policyRule     String
+  outcome        DecisionOutcome
+  riskLevel      RiskLevel
+  rationale      String
+  evidenceHash   String
+  timestamp      DateTime        @default(now())
+  organization   Organization    @relation(fields: [organizationId], references: [id])
+  organizationId String
+  workflow       Workflow        @relation(fields: [workflowId], references: [id])
+  workflowId     String
+  reviewer       User?           @relation(fields: [reviewerId], references: [id])
+  reviewerId     String?
+  approvals      Approval[]
+
+  @@index([organizationId])
+  @@index([workflowId])
+}
+
+model Approval {
+  id         String         @id @default(cuid())
+  status     ApprovalStatus @default(pending)
+  comment    String?
+  at         DateTime       @default(now())
+  decision   Decision       @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  decisionId String
+  reviewer   User           @relation(fields: [reviewerId], references: [id])
+  reviewerId String
+
+  @@index([decisionId])
+}
+
+model EvidencePack {
+  id             String       @id @default(cuid())
+  title          String
+  hash           String
+  status         PackStatus   @default(generating)
+  formats        String[]
+  sizeKb         Int          @default(0)
+  decisionIds    String[]
+  generatedAt    DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  responsible    User         @relation(fields: [responsibleId], references: [id])
+  responsibleId  String
+
+  @@index([organizationId])
+}
+
+model AuditEvent {
+  id             String       @id @default(cuid())
+  type           String
+  target         String
+  summary        String
+  hash           String
+  prevHash       String
+  at             DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+  actor          User         @relation(fields: [actorId], references: [id])
+  actorId        String
+
+  @@index([organizationId])
+}
+
+model Vendor {
+  id                String          @id @default(cuid())
+  name              String
+  category          String
+  status            VendorStatus    @default(under_review)
+  riskScore         Int             @default(0)
+  securityReview    ComplianceState @default(pending)
+  insurance         ComplianceState @default(pending)
+  soc2              ComplianceState @default(pending)
+  hipaa             ComplianceState @default(not_applicable)
+  fedramp           ComplianceState @default(not_applicable)
+  contractExpiresAt DateTime
+  approvalStatus    ApprovalStatus  @default(pending)
+  organization      Organization    @relation(fields: [organizationId], references: [id])
+  organizationId    String
+  owner             User            @relation(fields: [ownerId], references: [id])
+  ownerId           String
+  riskAssessments   RiskAssessment[]
+
+  @@index([organizationId])
+}
+
+model ProcurementOpportunity {
+  id               String            @id @default(cuid())
+  agency           String
+  name             String
+  naics            String
+  psc              String
+  status           OpportunityStatus @default(tracking)
+  matchScore       Int               @default(0)
+  estimatedValue   Decimal           @default(0)
+  requiredControls String[]
+  capabilityGaps   String[]
+  proposalDeadline DateTime
+  description      String
+  organization     Organization      @relation(fields: [organizationId], references: [id])
+  organizationId   String
+
+  @@index([organizationId])
+}
+
+model RiskAssessment {
+  id          String    @id @default(cuid())
+  subjectType String
+  subjectName String
+  score       Int
+  level       RiskLevel
+  factors     Json
+  assessedAt  DateTime  @default(now())
+  vendor      Vendor?   @relation(fields: [vendorId], references: [id])
+  vendorId    String?
+}
+
+model OrganizationSettings {
+  organizationId      String       @id
+  requireDualApproval Boolean      @default(true)
+  autoGenerateEvidence Boolean     @default(true)
+  notifyOnViolation   Boolean      @default(true)
+  retentionDays       Int          @default(2555)
+  riskThreshold       Int          @default(70)
+  dataRegion          String       @default("us-east")
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
