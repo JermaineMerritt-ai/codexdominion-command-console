@@ -62,12 +62,16 @@ Multi-step, human-approved, audited plans that orchestrate across modules
 (propose → approve → execute → audit). See
 [execution-plans.md](execution-plans.md).
 
+### ✅ Organization Knowledge Graph — delivered (Sprint 11)
+Governed knowledge graph (entities + relationships + gaps); execution plans are
+grounded in it. See [knowledge-graph.md](knowledge-graph.md).
+
 ### Proposed forward sequence
-- **Sprint 11** — Real Claude API (LLM **proposes** plans; execution stays governed)
-- **Sprint 12** — Real ChatGPT API behind the provider abstraction
-- **Sprint 13** — Microsoft 365 Copilot (document/report generation)
-- **Sprint 14** — Cross-module autonomous workflows (conditional steps, retries)
-- **Sprint 15** — Marketplace / SDK for third-party governed modules
+- **Sprint 12** — Claude integration (planner only — proposes plans over the graph; Codex remains the authority)
+- **Sprint 13** — ChatGPT integration (strategy / document generation)
+- **Sprint 14** — Microsoft 365 Copilot integration
+- **Sprint 15** — Cross-module autonomous workflows
+- **Sprint 16** — SDK + Marketplace for third-party governed modules
 
 ### Original vision (reference)
 

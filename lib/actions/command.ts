@@ -11,6 +11,7 @@ import {
 } from "@/lib/data/queries";
 import { getMutations } from "@/lib/data/mutations";
 import { getModules, getModuleAliases } from "@/lib/modules/registry";
+import { getKnowledgeGraph } from "@/lib/knowledge/registry";
 import { can, forbiddenMessage } from "@/lib/governance/rbac";
 import { computeEvidenceHash } from "@/lib/governance/audit";
 import { parseCommand } from "@/lib/command/intents";
@@ -113,6 +114,42 @@ export async function executeCommand(
     modules,
     moduleAliases: getModuleAliases(),
   };
+
+  // Organization knowledge graph — answered from governed context.
+  if (parsed.intent === "show_organization_knowledge") {
+    const graph = await getKnowledgeGraph();
+    const summary = `CodexDominion governs ${graph.stats.totalNodes} entities across ${graph.stats.totalEdges} relationships, with ${graph.stats.totalGaps} open knowledge gap${graph.stats.totalGaps === 1 ? "" : "s"}.`;
+    const audit = await mutations.recordCommandAudit(actor, {
+      intent: parsed.intent,
+      prompt: parsed.prompt,
+      summary,
+      afterState: { nodes: graph.stats.totalNodes, edges: graph.stats.totalEdges, gaps: graph.stats.totalGaps },
+    });
+    revalidatePath("/settings");
+    return {
+      ...base,
+      ok: true,
+      summary,
+      rows: graph.gaps.slice(0, 6).map((g) => ({
+        id: g.id,
+        title: g.label,
+        subtitle: g.detail,
+        badge: g.severity,
+        badgeStatus: g.severity,
+        href: g.href,
+      })),
+      recommendedActions: graph.gaps.length
+        ? ["Resolve the highest-severity knowledge gaps first."]
+        : [],
+      evidenceLinks: [{ label: "Open Knowledge Graph", href: "/knowledge" }],
+      riskLevel: graph.gaps.some((g) => g.severity === "critical")
+        ? "critical"
+        : graph.gaps.some((g) => g.severity === "high")
+          ? "high"
+          : "low",
+      auditEventId: audit.id,
+    };
+  }
 
   // Provider not connected → governed, parsed, audited, but not executed.
   if (!provider.connected) {

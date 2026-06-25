@@ -1,4 +1,5 @@
 import type { RiskLevel } from "@/types";
+import type { KnowledgeContextItem } from "@/lib/knowledge/types";
 
 export type ExecutionStatus =
   | "proposed"
@@ -34,6 +35,8 @@ export interface ExecutionPlan {
   riskLevel: RiskLevel;
   modules: string[];
   status: ExecutionStatus;
+  /** Organization context (from the knowledge graph) this plan is grounded in. */
+  context?: KnowledgeContextItem[];
 }
 
 export interface ExecutionRun {

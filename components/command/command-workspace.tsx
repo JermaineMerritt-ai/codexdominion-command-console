@@ -22,8 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { executeCommand } from "@/lib/actions/command";
-import { executePlan } from "@/lib/actions/execution";
-import { buildExecutionPlan } from "@/lib/execution/plans";
+import { executePlan, proposePlan } from "@/lib/actions/execution";
 import {
   ExecutionPlanCard,
   ExecutionRunCard,
@@ -95,15 +94,16 @@ export function CommandWorkspace({
     if (!text) return;
     setInput("");
     setPlanError(null);
-    // A prompt that matches a plan template proposes a plan (human approves
-    // before anything executes). Otherwise it runs as a single command.
-    const proposed = buildExecutionPlan(text);
-    if (proposed) {
-      setRun(null);
-      setPlan(proposed);
-      return;
-    }
+    // A prompt that matches a plan template proposes a plan grounded in the
+    // organization knowledge graph (human approves before anything executes).
+    // Otherwise it runs as a single command.
     startTransition(async () => {
+      const proposed = await proposePlan(text);
+      if (proposed) {
+        setRun(null);
+        setPlan(proposed);
+        return;
+      }
       const result = await executeCommand(text, provider);
       setHistory((h) => [result, ...h]);
     });

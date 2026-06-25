@@ -6,11 +6,25 @@ import { getMutations } from "@/lib/data/mutations";
 import { can, forbiddenMessage } from "@/lib/governance/rbac";
 import { executeCommand } from "@/lib/actions/command";
 import { buildExecutionPlan } from "@/lib/execution/plans";
+import { getKnowledgeGraph } from "@/lib/knowledge/registry";
+import { planContext } from "@/lib/knowledge/graph";
 import type { ExecutionPlan, ExecutionRun, ExecutionStep } from "@/lib/execution/types";
 
-/** Propose a plan from a prompt (no execution). Returns null if not a plan. */
+/**
+ * Propose a plan from a prompt (no execution). Grounds the plan in the
+ * organization knowledge graph so steps reference real context. Null if the
+ * prompt is not a plan.
+ */
 export async function proposePlan(prompt: string): Promise<ExecutionPlan | null> {
-  return buildExecutionPlan(prompt);
+  const plan = buildExecutionPlan(prompt);
+  if (!plan) return null;
+  try {
+    const graph = await getKnowledgeGraph();
+    plan.context = planContext(graph, plan.intent);
+  } catch {
+    /* context is best-effort; the plan still works without it */
+  }
+  return plan;
 }
 
 export type ExecuteResult =

@@ -31,6 +31,7 @@ export type CommandIntent =
   | "show_gcfi_audit_events"
   | "show_contractor_milestone_risks"
   | "show_payment_approval_risks"
+  | "show_organization_knowledge"
   | "unsupported";
 
 export interface IntentDefinition {
@@ -145,6 +146,13 @@ export const INTENT_DEFINITIONS: IntentDefinition[] = [
     permission: "view_control_plane",
     patterns: [/control[\s-]?plane.*audit/i],
     sample: "Show control plane audit events",
+  },
+  {
+    intent: "show_organization_knowledge",
+    label: "Show organization knowledge",
+    permission: null,
+    patterns: [/knowledge graph/i, /organization knowledge/i, /what.*\bknow\b/i],
+    sample: "Show organization knowledge graph",
   },
   {
     intent: "explain_decision",

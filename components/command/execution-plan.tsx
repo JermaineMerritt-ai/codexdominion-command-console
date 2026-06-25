@@ -74,6 +74,29 @@ export function ExecutionPlanCard({
           <Badge variant="neutral" className="font-mono">{plan.id}</Badge>
         </div>
 
+        {plan.context && plan.context.length > 0 && (
+          <div className="rounded-md border bg-muted/30 p-3">
+            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Based on your organization
+            </p>
+            <ul className="space-y-1.5">
+              {plan.context.map((c, i) => (
+                <li key={i} className="flex items-start justify-between gap-2 text-sm">
+                  <span className="min-w-0">
+                    <span className="font-medium">{c.label}</span>
+                    {c.detail && (
+                      <span className="block text-xs text-muted-foreground">
+                        {c.detail}
+                      </span>
+                    )}
+                  </span>
+                  {c.severity && <StatusBadge status={c.severity} />}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <ol className="space-y-2">
           {plan.steps.map((s, i) => {
             const checked = include[s.key] ?? true;
