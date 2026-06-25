@@ -39,6 +39,14 @@ const KNOWN_STATUSES = new Set([
   "pending_review",
   "under_review",
   "expiring",
+  "active",
+  "needs_integration",
+  "planned",
+  "inactive",
+  "healthy",
+  "degraded",
+  "offline",
+  "unknown",
 ]);
 
 function RowBadge({ row }: { row: CommandResult["rows"][number] }) {

@@ -36,11 +36,16 @@ routes execution to interchangeable providers (Codex active; Claude/ChatGPT/
 Copilot preview). See [command-workspace.md](command-workspace.md) and
 [ai-provider-routing.md](ai-provider-routing.md).
 
+### ✅ Module Registry + Integration Contract — delivered (Sprint 06)
+Every CodexDominion app reports into the Console via the `GovernanceModule`
+contract; `/modules` registry + detail pages + 5 module commands. See
+[module-registry.md](module-registry.md) and
+[integration-contract.md](integration-contract.md).
+
 ### Proposed forward sequence
-- **Sprint 06** — Real provider integration (Claude/ChatGPT) behind the abstraction
-- **Sprint 07** — Multi-step plan execution (run each planned intent, governed)
-- **Sprint 08** — Module Registry (ComplianceFlow, GrantOps, EscrowFlow, …)
-- **Sprint 09** — Live integration with `codex-control-plane`
+- **Sprint 07** — Live integration with `codex-control-plane` (first real contract binding)
+- **Sprint 08** — Real provider integration (Claude/ChatGPT) behind the abstraction
+- **Sprint 09** — Multi-step plan execution (run each planned intent, governed)
 - **Sprint 10** — Multi-organization (tenants / workspaces)
 - **Sprint 11** — Enterprise SSO (Entra ID, Okta) + SCIM
 - **Sprint 12** — Research provider integration

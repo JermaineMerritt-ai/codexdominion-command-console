@@ -34,6 +34,11 @@ prompt
 | "Prepare a buyer demo summary" | `prepare_buyer_demo_summary` | query |
 | "Review system risk posture" | `review_system_risk_posture` | query |
 | "Recommend next governance action" | `recommend_next_governance_action` | query |
+| "Show active modules" | `show_active_modules` | query |
+| "Show modules needing integration" | `show_modules_needing_integration` | query |
+| "Show highest risk module" | `show_highest_risk_module` | query |
+| "Show module status for [name]" | `show_module_status` | query |
+| "Recommend next module integration" | `recommend_next_module_integration` | query |
 | "Generate evidence pack for denied decisions" | `generate_evidence_for_denied` | `generate_evidence_pack` |
 
 Unrecognized prompts return a clear "unsupported" message — the engine never

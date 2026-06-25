@@ -41,6 +41,15 @@ const MAP: Record<string, { label: string; variant: Variant }> = {
   active: { label: "Active", variant: "success" },
   invited: { label: "Invited", variant: "warning" },
   suspended: { label: "Suspended", variant: "destructive" },
+  // module statuses
+  needs_integration: { label: "Needs Integration", variant: "warning" },
+  planned: { label: "Planned", variant: "neutral" },
+  inactive: { label: "Inactive", variant: "neutral" },
+  // module health
+  healthy: { label: "Healthy", variant: "success" },
+  degraded: { label: "Degraded", variant: "warning" },
+  offline: { label: "Offline", variant: "destructive" },
+  unknown: { label: "Unknown", variant: "neutral" },
 };
 
 export function StatusBadge({

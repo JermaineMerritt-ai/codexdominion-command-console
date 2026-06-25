@@ -7,6 +7,12 @@ import type {
   Workflow,
 } from "@/types";
 import type { CommandIntent, ParsedCommand } from "./intents";
+import {
+  findModuleByText,
+  highestRiskModule,
+  nextIntegrationModule,
+  type ModuleView,
+} from "@/lib/modules/contract";
 
 export interface CommandRow {
   id: string;
@@ -48,6 +54,19 @@ export interface CommandData {
   vendors: Vendor[];
   opportunities: ProcurementOpportunity[];
   auditEvents: AuditEvent[];
+  modules?: ModuleView[];
+  moduleAliases?: Record<string, string[]>;
+}
+
+function moduleRow(m: ModuleView): CommandRow {
+  return {
+    id: m.id,
+    title: m.name,
+    subtitle: `${m.category} · ${m.health} · ${m.integrationMaturity}% integrated`,
+    badge: m.status,
+    badgeStatus: m.status,
+    href: `/modules/${m.id}`,
+  };
 }
 
 const DAY = 86400000;
@@ -344,6 +363,99 @@ export function runQuery(
         evidenceLinks: [],
         riskLevel: level,
         nextStep,
+      };
+    }
+
+    case "show_active_modules": {
+      const mods = (data.modules ?? []).filter((m) => m.status === "active");
+      return {
+        summary: `${mods.length} active module${mods.length === 1 ? "" : "s"} reporting into the Console.`,
+        rows: mods.map(moduleRow),
+        recommendedActions: [],
+        evidenceLinks: [{ label: "Open Module Registry", href: "/modules" }],
+        riskLevel: "low",
+      };
+    }
+
+    case "show_modules_needing_integration": {
+      const mods = (data.modules ?? []).filter(
+        (m) => m.status === "needs_integration" || m.status === "planned",
+      );
+      const next = nextIntegrationModule(data.modules ?? []);
+      return {
+        summary: `${mods.length} module${mods.length === 1 ? "" : "s"} not yet fully governed.`,
+        rows: mods.map(moduleRow),
+        recommendedActions: mods.map(
+          (m) => `${m.name}: ${m.recommendedNextStep}`,
+        ),
+        evidenceLinks: [{ label: "Open Module Registry", href: "/modules" }],
+        riskLevel: "medium",
+        nextStep: next ? `Start with ${next.name} (${next.integrationMaturity}% integrated).` : undefined,
+      };
+    }
+
+    case "show_highest_risk_module": {
+      const m = highestRiskModule(data.modules ?? []);
+      if (!m) {
+        return { summary: "No modules registered.", rows: [], recommendedActions: [], evidenceLinks: [] };
+      }
+      const level: RiskLevel = m.metrics.riskFlags >= 2 ? "critical" : m.metrics.riskFlags === 1 ? "high" : "low";
+      return {
+        summary: `${m.name} carries the most governance risk: ${m.metrics.riskFlags} risk flag(s), ${m.integrationMaturity}% integrated, health ${m.health}.`,
+        rows: [moduleRow(m), ...m.riskItems.map<CommandRow>((r) => ({ id: r.id, title: r.label, subtitle: "Risk item", badge: r.level, badgeStatus: r.level }))],
+        recommendedActions: [m.recommendedNextStep],
+        evidenceLinks: [{ label: `Open ${m.name}`, href: `/modules/${m.id}` }],
+        riskLevel: level,
+        nextStep: m.recommendedNextStep,
+      };
+    }
+
+    case "show_module_status": {
+      const m = findModuleByText(
+        data.modules ?? [],
+        data.moduleAliases ?? {},
+        parsed.prompt,
+      );
+      if (!m) {
+        const names = (data.modules ?? []).map((x) => x.name).slice(0, 5).join(", ");
+        return {
+          summary: `Specify a module, e.g. "Show module status for ComplianceFlow". Known: ${names}…`,
+          rows: [],
+          recommendedActions: [],
+          evidenceLinks: [{ label: "Open Module Registry", href: "/modules" }],
+        };
+      }
+      const level: RiskLevel =
+        m.health === "offline" ? "critical" : m.health === "degraded" ? "high" : "low";
+      return {
+        summary: `${m.name} — ${m.status.replace("_", " ")}, health ${m.health}, ${m.integrationMaturity}% integrated. Workflows ${m.metrics.activeWorkflows}, decisions ${m.metrics.openDecisions}, evidence ${m.metrics.evidenceItems}, risk flags ${m.metrics.riskFlags}.`,
+        rows: [moduleRow(m)],
+        recommendedActions: [m.recommendedNextStep],
+        evidenceLinks: [{ label: `Open ${m.name}`, href: `/modules/${m.id}` }],
+        riskLevel: level,
+        nextStep: m.recommendedNextStep,
+      };
+    }
+
+    case "recommend_next_module_integration": {
+      const m = nextIntegrationModule(data.modules ?? []);
+      if (!m) {
+        return {
+          summary: "All modules are active — nothing pending integration.",
+          rows: [],
+          recommendedActions: [],
+          evidenceLinks: [{ label: "Open Module Registry", href: "/modules" }],
+          riskLevel: "low",
+        };
+      }
+      const step = `Integrate ${m.name} next — it is the closest to done at ${m.integrationMaturity}%. ${m.recommendedNextStep}`;
+      return {
+        summary: step,
+        rows: [moduleRow(m)],
+        recommendedActions: [m.recommendedNextStep],
+        evidenceLinks: [{ label: `Open ${m.name}`, href: `/modules/${m.id}` }],
+        riskLevel: "medium",
+        nextStep: step,
       };
     }
 

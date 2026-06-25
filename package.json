@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test tests/governance.test.ts tests/rbac.test.ts tests/command.test.ts tests/providers.test.ts",
+    "test": "node --import tsx --test tests/governance.test.ts tests/rbac.test.ts tests/command.test.ts tests/providers.test.ts tests/modules.test.ts",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "postinstall": "prisma generate",
     "db:generate": "prisma generate",

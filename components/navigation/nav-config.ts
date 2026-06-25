@@ -1,6 +1,7 @@
 import {
   LayoutDashboard,
   Terminal,
+  Boxes,
   Gavel,
   FileCheck2,
   Building2,
@@ -39,6 +40,17 @@ export const navGroups: NavGroup[] = [
         href: "/command",
         icon: Terminal,
         description: "Governed natural-language workspace",
+      },
+    ],
+  },
+  {
+    label: "Platform",
+    items: [
+      {
+        title: "Modules",
+        href: "/modules",
+        icon: Boxes,
+        description: "Module registry & integration contract",
       },
     ],
   },

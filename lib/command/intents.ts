@@ -12,6 +12,11 @@ export type CommandIntent =
   | "prepare_buyer_demo_summary"
   | "review_system_risk_posture"
   | "recommend_next_governance_action"
+  | "show_active_modules"
+  | "show_modules_needing_integration"
+  | "show_highest_risk_module"
+  | "show_module_status"
+  | "recommend_next_module_integration"
   | "unsupported";
 
 export interface IntentDefinition {
@@ -83,6 +88,41 @@ export const INTENT_DEFINITIONS: IntentDefinition[] = [
       /high[\s-]?match/i,
     ],
     sample: "Show procurement opportunities with high match scores",
+  },
+  {
+    intent: "recommend_next_module_integration",
+    label: "Recommend next module integration",
+    permission: null,
+    patterns: [/recommend.*module/i, /next\s+module/i],
+    sample: "Recommend next module integration",
+  },
+  {
+    intent: "show_modules_needing_integration",
+    label: "Show modules needing integration",
+    permission: null,
+    patterns: [/need(ing)?\s+integrat/i, /require.*integrat/i, /unintegrated/i],
+    sample: "Show modules needing integration",
+  },
+  {
+    intent: "show_highest_risk_module",
+    label: "Show highest-risk module",
+    permission: null,
+    patterns: [/(highest|most|riskiest).*module/i, /module.*risk/i, /risk.*module/i],
+    sample: "Show highest risk module",
+  },
+  {
+    intent: "show_module_status",
+    label: "Show module status",
+    permission: null,
+    patterns: [/module\s+status/i, /status\s+(of|for)\s+/i],
+    sample: "Show module status for ComplianceFlow",
+  },
+  {
+    intent: "show_active_modules",
+    label: "Show active modules",
+    permission: null,
+    patterns: [/active\s+modules/i, /modules?.*active/i, /\bmodules\b/i],
+    sample: "Show active modules",
   },
   {
     intent: "prepare_buyer_demo_summary",

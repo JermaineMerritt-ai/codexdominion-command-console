@@ -10,6 +10,7 @@ import {
   getWorkflows,
 } from "@/lib/data/queries";
 import { getMutations } from "@/lib/data/mutations";
+import { getModules, getModuleAliases } from "@/lib/modules/registry";
 import { can, forbiddenMessage } from "@/lib/governance/rbac";
 import { computeEvidenceHash } from "@/lib/governance/audit";
 import { parseCommand } from "@/lib/command/intents";
@@ -94,15 +95,24 @@ export async function executeCommand(
     };
   }
 
-  const [decisions, workflows, vendors, opportunities, auditEvents] =
+  const [decisions, workflows, vendors, opportunities, auditEvents, modules] =
     await Promise.all([
       getDecisions(),
       getWorkflows(),
       getVendors(),
       getOpportunities(),
       getAuditEvents(),
+      getModules(),
     ]);
-  const data: CommandData = { decisions, workflows, vendors, opportunities, auditEvents };
+  const data: CommandData = {
+    decisions,
+    workflows,
+    vendors,
+    opportunities,
+    auditEvents,
+    modules,
+    moduleAliases: getModuleAliases(),
+  };
 
   // Provider not connected → governed, parsed, audited, but not executed.
   if (!provider.connected) {

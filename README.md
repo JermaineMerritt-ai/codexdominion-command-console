@@ -66,6 +66,11 @@ Show audit events for DEC-2026-0480
 Prepare a buyer demo summary
 Review system risk posture
 Recommend next governance action
+Show active modules
+Show modules needing integration
+Show highest risk module
+Show module status for ComplianceFlow
+Recommend next module integration
 Generate evidence pack for denied decisions   (requires evidence permission)
 ```
 
@@ -74,6 +79,21 @@ actions, evidence links) and writes a `command.executed` audit event; blocked
 commands return a forbidden message and record `authorization.denied`. The
 product arc: **visibility → action → authority (RBAC) → governed AI interface →
 proof (audit)**. See [docs/command-workspace.md](docs/command-workspace.md).
+
+## 🧩 Module Registry
+
+`/modules` is **what CodexDominion governs** — every vertical app reports into the
+Console through a standard **Integration Contract**
+(`GovernanceModule`: workflows, decisions, evidence, policies, audit, risk). Each
+module card shows status, health, metrics, and an **integration maturity** score;
+detail pages show the contract capability checklist, missing capabilities, and
+the recommended next integration step.
+
+Demo-seeded today (9 modules: codex-control-plane, ComplianceFlow,
+codex-procurement-network, GCFI, ClinicalFlow, EscrowFlow, CareLedger, GrantOps,
+codexjustice-platform); a live module API can replace the source without changing
+the Console. See [docs/module-registry.md](docs/module-registry.md) and
+[docs/integration-contract.md](docs/integration-contract.md).
 
 ## ⚙️ Live governance actions
 
@@ -181,9 +201,10 @@ docs/           Architecture, data model, API, deployment, roadmap
 - [Compliance Mapping](docs/compliance.md)
 - [Audit Events](docs/audit-events.md)
 - [Command Workspace](docs/command-workspace.md) · [AI Provider Routing](docs/ai-provider-routing.md)
+- [Module Registry](docs/module-registry.md) · [Integration Contract](docs/integration-contract.md)
 - [Deployment](docs/deployment.md)
 - [Roadmap](docs/roadmap.md)
-- [Sprint 01](docs/sprint-01.md) · [02](docs/sprint-02.md) · [03](docs/sprint-03.md) · [04](docs/sprint-04.md) · [05](docs/sprint-05.md)
+- [Sprint 01](docs/sprint-01.md) · [02](docs/sprint-02.md) · [03](docs/sprint-03.md) · [04](docs/sprint-04.md) · [05](docs/sprint-05.md) · [06](docs/sprint-06.md)
 - [Demo Script](docs/demo-script.md)
 - [Contributing](CONTRIBUTING.md)
 
