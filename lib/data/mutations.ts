@@ -5,6 +5,7 @@ import { buildAuditEvent, computeEvidenceHash } from "@/lib/governance/audit";
 import { canTransition } from "@/lib/governance/transitions";
 import type {
   AuditEntityType,
+  AuditEvent,
   Decision,
   EvidencePack,
   Policy,
@@ -44,6 +45,16 @@ export interface GovernanceMutations {
     entityType: AuditEntityType,
     entityId: string,
   ): Promise<void>;
+  /** Record a Command Workspace execution; returns the audit event. */
+  recordCommandAudit(
+    actor: Actor,
+    args: {
+      intent: string;
+      prompt: string;
+      summary: string;
+      afterState: Record<string, unknown>;
+    },
+  ): Promise<AuditEvent>;
 }
 
 const now = () => new Date().toISOString();
@@ -256,6 +267,20 @@ export const demoMutations: GovernanceMutations = {
       summary: `Authorization denied: ${actor.role} attempted ${action} on ${entityId}`,
       beforeState: { role: actor.role },
       afterState: { blocked: true },
+    });
+  },
+
+  async recordCommandAudit(actor, args) {
+    return appendAudit({
+      type: "command.executed",
+      action: "command.executed",
+      actor,
+      organizationId: actor.organizationId,
+      entityType: "command",
+      entityId: args.intent,
+      summary: `Command: "${args.prompt}" → ${args.summary}`,
+      beforeState: null,
+      afterState: args.afterState,
     });
   },
 };

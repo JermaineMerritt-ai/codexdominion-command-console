@@ -61,7 +61,8 @@ export type AuditEventType =
   | "vendor.reviewed"
   | "workflow.transitioned"
   | "user.role_changed"
-  | "authorization.denied";
+  | "authorization.denied"
+  | "command.executed";
 
 /** Entity a mutation/audit event targets. */
 export type AuditEntityType =
@@ -69,7 +70,8 @@ export type AuditEntityType =
   | "workflow"
   | "policy"
   | "vendor"
-  | "evidence_pack";
+  | "evidence_pack"
+  | "command";
 
 export interface Organization {
   id: string;

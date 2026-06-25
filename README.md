@@ -46,6 +46,29 @@ The console runs **zero-config** in **DEMO mode**. With no environment variables
 it serves a rich, typed **seed-data layer** so every screen is immediately
 demoable — ideal for enterprise pilot demonstrations and public previews.
 
+## 🧭 Command Workspace
+
+`/command` is a **governed command interface** — describe what you need in plain
+language and CodexDominion interprets it, enforces governance, executes, and
+audits. It's **deterministic** (no LLM / API keys): every command is explainable
+and access-controlled.
+
+```
+Show high-risk decisions
+Show pending approvals
+Show vendors with expiring certifications
+Show procurement opportunities with high match scores
+Explain why decision DEC-2026-0480 was denied
+Show audit events for DEC-2026-0480
+Generate evidence pack for denied decisions   (requires evidence permission)
+```
+
+Each command returns a structured result (summary, linked rows, recommended
+actions, evidence links) and writes a `command.executed` audit event; blocked
+commands return a forbidden message and record `authorization.denied`. The
+product arc: **visibility → action → authority (RBAC) → governed AI interface →
+proof (audit)**. See [docs/command-workspace.md](docs/command-workspace.md).
+
 ## ⚙️ Live governance actions
 
 The console is **operational**, not read-only. Every action runs as a validated
@@ -151,9 +174,10 @@ docs/           Architecture, data model, API, deployment, roadmap
 - [Authentication](docs/auth.md) · [RBAC](docs/rbac.md)
 - [Compliance Mapping](docs/compliance.md)
 - [Audit Events](docs/audit-events.md)
+- [Command Workspace](docs/command-workspace.md)
 - [Deployment](docs/deployment.md)
 - [Roadmap](docs/roadmap.md)
-- [Sprint 01](docs/sprint-01.md) · [Sprint 02](docs/sprint-02.md) · [Sprint 03](docs/sprint-03.md)
+- [Sprint 01](docs/sprint-01.md) · [Sprint 02](docs/sprint-02.md) · [Sprint 03](docs/sprint-03.md) · [Sprint 04](docs/sprint-04.md)
 - [Demo Script](docs/demo-script.md)
 - [Contributing](CONTRIBUTING.md)
 

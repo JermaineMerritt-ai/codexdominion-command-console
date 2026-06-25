@@ -1,5 +1,6 @@
 import {
   LayoutDashboard,
+  Terminal,
   Gavel,
   FileCheck2,
   Building2,
@@ -32,6 +33,12 @@ export const navGroups: NavGroup[] = [
         href: "/dashboard",
         icon: LayoutDashboard,
         description: "Executive governance overview",
+      },
+      {
+        title: "Command",
+        href: "/command",
+        icon: Terminal,
+        description: "Governed natural-language workspace",
       },
     ],
   },
