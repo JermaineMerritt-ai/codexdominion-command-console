@@ -63,16 +63,22 @@ the role. Unmatched accounts get least-privilege `viewer`. See
 > Middleware **fails open** if `REQUIRE_AUTH=true` but Supabase keys are missing
 > — always set the keys when enabling auth.
 
-### 6. Bind the live control plane (optional)
+### 6. Bind live modules (optional)
+Each module shares the same env pattern (`<MODULE>_MODE` / `_API_URL` / `_API_KEY`):
 ```
 CODEX_CONTROL_PLANE_MODE=live
 CODEX_CONTROL_PLANE_API_URL=https://<your-control-plane>/module
-CODEX_CONTROL_PLANE_API_KEY=...    # optional
+COMPLIANCEFLOW_MODE=live
+COMPLIANCEFLOW_API_URL=https://<your-complianceflow>/module
+GCFI_MODE=live
+GCFI_API_URL=https://<your-gcfi>/module
 ```
-With no values set, the console runs in demo mode and the control-plane module
-shows **Demo fallback** — the public demo always works. If the live API fails,
-the module degrades to seed data automatically. See
-[live-control-plane-binding.md](live-control-plane-binding.md).
+With no values set, the console runs in demo mode and every module shows
+**Demo fallback** — the public demo always works. If a live API fails, that
+module degrades to seed data automatically. Registry pages use ISR (30s) so live
+data stays fresh. See [live-control-plane-binding.md](live-control-plane-binding.md),
+[live-complianceflow-binding.md](live-complianceflow-binding.md), and
+[live-gcfi-binding.md](live-gcfi-binding.md).
 
 ## Rollback / safety
 

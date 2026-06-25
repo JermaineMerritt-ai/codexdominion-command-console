@@ -44,13 +44,14 @@ six.
 - **Today (demo):** modules are backed by seed records
   (`lib/data/modules.ts`); `createGovernanceModule(record)` wraps a record as a
   contract implementation. No live repo/API access.
-- **Live (proven, ×2):** `codex-control-plane` **and** `ComplianceFlow` both bind
-  to live APIs through this contract using shared adapter utilities
+- **Live (proven, ×3):** `codex-control-plane`, `ComplianceFlow`, **and** GCFI
+  all bind to live APIs through this contract using shared adapter utilities
   (`live-client.ts` + `live-adapter.ts`) — fetch live data into a record, wrap
   with `createGovernanceModule`, fall back to seed on failure. **Nothing else in
   the Console changes.** See
-  [live-control-plane-binding.md](live-control-plane-binding.md) and
-  [live-complianceflow-binding.md](live-complianceflow-binding.md).
+  [live-control-plane-binding.md](live-control-plane-binding.md),
+  [live-complianceflow-binding.md](live-complianceflow-binding.md), and
+  [live-gcfi-binding.md](live-gcfi-binding.md).
 - **Tomorrow:** the remaining modules follow the identical 3-step pattern —
   adapter wrapper + registry entry + command/RBAC entries.
 

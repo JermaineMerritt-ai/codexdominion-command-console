@@ -2,6 +2,7 @@ import { modules, moduleAliases } from "@/lib/data/modules";
 import { toModuleView, type ModuleStatus, type ModuleView } from "./contract";
 import { CONTROL_PLANE_ID, loadControlPlaneView } from "./control-plane/adapter";
 import { COMPLIANCEFLOW_ID, loadComplianceFlowView } from "./complianceflow/adapter";
+import { GCFI_ID, loadGcfiView } from "./gcfi/adapter";
 
 // Module registry accessors. Demo-backed today; the Integration Contract means a
 // live module API can replace the source without changing the Console. Modules
@@ -10,6 +11,7 @@ import { COMPLIANCEFLOW_ID, loadComplianceFlowView } from "./complianceflow/adap
 const LIVE_BINDINGS: Record<string, () => Promise<ModuleView>> = {
   [CONTROL_PLANE_ID]: loadControlPlaneView,
   [COMPLIANCEFLOW_ID]: loadComplianceFlowView,
+  [GCFI_ID]: loadGcfiView,
 };
 
 export async function getModules(): Promise<ModuleView[]> {

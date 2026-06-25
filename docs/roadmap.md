@@ -52,13 +52,18 @@ ISR-based live-safe `/modules`; ComplianceFlow bound as the second live module
 via shared adapter utilities. See
 [live-complianceflow-binding.md](live-complianceflow-binding.md).
 
+### ✅ Third live binding (GCFI) — delivered (Sprint 09)
+Government Contractor Financial Infrastructure bound via the shared adapter, with
+contract-milestone and payment-approval risk commands. See
+[live-gcfi-binding.md](live-gcfi-binding.md).
+
 ### Proposed forward sequence
-- **Sprint 09** — Bind a 3rd module (GCFI / procurement) to confirm the pattern
 - **Sprint 10** — Real provider integration (Claude/ChatGPT) behind the abstraction
-- **Sprint 11** — Multi-step plan execution (run each planned intent, governed)
-- **Sprint 12** — Multi-organization (tenants / workspaces)
-- **Sprint 13** — Enterprise SSO (Entra ID, Okta) + SCIM
-- **Sprint 14** — Research provider integration
+- **Sprint 11** — Bind procurement / CareLedger to round out verticals
+- **Sprint 12** — Multi-step plan execution (run each planned intent, governed)
+- **Sprint 13** — Multi-organization (tenants / workspaces)
+- **Sprint 14** — Enterprise SSO (Entra ID, Okta) + SCIM
+- **Sprint 15** — Research provider integration
 
 ### Original vision (reference)
 

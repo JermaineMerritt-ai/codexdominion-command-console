@@ -72,6 +72,8 @@ function moduleRow(m: ModuleView): CommandRow {
   };
 }
 
+const GCFI_MODULE_ID = "government-contractor-financial-infrastructure";
+
 type LiveModuleKind = "sync" | "health" | "decisions" | "audit";
 interface LiveModuleSpec {
   moduleId: string;
@@ -89,6 +91,10 @@ const LIVE_MODULE_COMMANDS: Record<string, LiveModuleSpec> = {
   show_complianceflow_health: { moduleId: "complianceflow", kind: "health", envVar: "COMPLIANCEFLOW_MODE" },
   show_complianceflow_decisions: { moduleId: "complianceflow", kind: "decisions", envVar: "COMPLIANCEFLOW_MODE" },
   show_complianceflow_audit_events: { moduleId: "complianceflow", kind: "audit", envVar: "COMPLIANCEFLOW_MODE" },
+  sync_gcfi: { moduleId: GCFI_MODULE_ID, kind: "sync", envVar: "GCFI_MODE" },
+  show_gcfi_health: { moduleId: GCFI_MODULE_ID, kind: "health", envVar: "GCFI_MODE" },
+  show_gcfi_decisions: { moduleId: GCFI_MODULE_ID, kind: "decisions", envVar: "GCFI_MODE" },
+  show_gcfi_audit_events: { moduleId: GCFI_MODULE_ID, kind: "audit", envVar: "GCFI_MODE" },
 };
 
 /** Shared builder for live-module commands (health/sync/decisions/audit). */
@@ -572,9 +578,63 @@ export function runQuery(
     case "sync_complianceflow":
     case "show_complianceflow_health":
     case "show_complianceflow_decisions":
-    case "show_complianceflow_audit_events": {
+    case "show_complianceflow_audit_events":
+    case "sync_gcfi":
+    case "show_gcfi_health":
+    case "show_gcfi_decisions":
+    case "show_gcfi_audit_events": {
       const spec = LIVE_MODULE_COMMANDS[parsed.intent];
       return liveModuleCommandBody(spec, data);
+    }
+
+    case "show_contractor_milestone_risks":
+    case "show_payment_approval_risks": {
+      const gcfi = (data.modules ?? []).find((m) => m.id === GCFI_MODULE_ID);
+      if (!gcfi) {
+        return {
+          summary: "The GCFI module is not registered.",
+          rows: [],
+          recommendedActions: [],
+          evidenceLinks: [],
+        };
+      }
+      const isMilestone = parsed.intent === "show_contractor_milestone_risks";
+      const kw = isMilestone
+        ? /milestone|contractor|disburse/i
+        : /payment|authoriz|approval|dual/i;
+      const items = gcfi.riskItems.filter((r) => kw.test(r.label));
+      const src = gcfi.source;
+      const provenance = src
+        ? `Source: ${src.source}${src.latencyMs != null ? ` · ${src.latencyMs}ms` : ""}.`
+        : "Source: seed_data.";
+      const label = isMilestone
+        ? "contractor milestone"
+        : "payment approval";
+      const level: RiskLevel = items.some((r) => r.level === "critical")
+        ? "critical"
+        : items.some((r) => r.level === "high")
+          ? "high"
+          : "low";
+      return {
+        summary: `${items.length} ${label} risk${items.length === 1 ? "" : "s"} in GCFI. ${provenance}`,
+        rows: items.map<CommandRow>((r) => ({
+          id: r.id,
+          title: r.label,
+          subtitle: "GCFI risk item",
+          badge: r.level,
+          badgeStatus: r.level,
+          href: `/modules/${GCFI_MODULE_ID}`,
+        })),
+        recommendedActions: items.length
+          ? ["Resolve the highest-severity item before authorizing payment."]
+          : [],
+        evidenceLinks: [{ label: "Open GCFI", href: `/modules/${GCFI_MODULE_ID}` }],
+        riskLevel: level,
+        nextStep: items.length
+          ? `Address: ${items[0].label}.`
+          : undefined,
+        source: src,
+      };
     }
 
     default:

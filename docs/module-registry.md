@@ -53,7 +53,7 @@ See [command-workspace.md](command-workspace.md).
 
 ## Live bindings
 
-`codex-control-plane` and `ComplianceFlow` both have **live bindings**: when
+`codex-control-plane`, `ComplianceFlow`, and `GCFI` have **live bindings**: when
 `<MODULE>_MODE=live` and an API URL are set, the card and detail page show
 **Connected** (or **Degraded** with seed fallback on failure); otherwise **Demo
 fallback** / **Live-ready**. The registry pages are **live-safe** (ISR, 30s) so

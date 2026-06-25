@@ -39,6 +39,9 @@ prompt
 | "Show highest risk module" | `show_highest_risk_module` | query |
 | "Show module status for [name]" | `show_module_status` | query |
 | "Recommend next module integration" | `recommend_next_module_integration` | query |
+| "Show / Sync control plane · ComplianceFlow · GCFI" | live-module commands | `view_*` / `sync_*` |
+| "Show contractor milestone risks" | `show_contractor_milestone_risks` | `view_gcfi` |
+| "Show payment approval risks" | `show_payment_approval_risks` | `view_gcfi` |
 | "Generate evidence pack for denied decisions" | `generate_evidence_for_denied` | `generate_evidence_pack` |
 
 Unrecognized prompts return a clear "unsupported" message — the engine never

@@ -113,6 +113,7 @@ export async function resolveLiveModuleView(args: {
 export function anyModuleLive(): boolean {
   return (
     process.env.CODEX_CONTROL_PLANE_MODE === "live" ||
-    process.env.COMPLIANCEFLOW_MODE === "live"
+    process.env.COMPLIANCEFLOW_MODE === "live" ||
+    process.env.GCFI_MODE === "live"
   );
 }

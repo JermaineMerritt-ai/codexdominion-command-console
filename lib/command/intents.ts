@@ -25,6 +25,12 @@ export type CommandIntent =
   | "show_complianceflow_health"
   | "show_complianceflow_decisions"
   | "show_complianceflow_audit_events"
+  | "sync_gcfi"
+  | "show_gcfi_health"
+  | "show_gcfi_decisions"
+  | "show_gcfi_audit_events"
+  | "show_contractor_milestone_risks"
+  | "show_payment_approval_risks"
   | "unsupported";
 
 export interface IntentDefinition {
@@ -42,6 +48,48 @@ const ID_PATTERN =
 
 // Order matters: more specific intents are matched first.
 export const INTENT_DEFINITIONS: IntentDefinition[] = [
+  {
+    intent: "show_contractor_milestone_risks",
+    label: "Show contractor milestone risks",
+    permission: "view_gcfi",
+    patterns: [/milestone\s+risk/i, /contractor\s+milestone/i, /milestone.*risk/i],
+    sample: "Show contractor milestone risks",
+  },
+  {
+    intent: "show_payment_approval_risks",
+    label: "Show payment approval risks",
+    permission: "view_gcfi",
+    patterns: [/payment.*(risk|approval|authoriz)/i, /payment\s+approval/i],
+    sample: "Show payment approval risks",
+  },
+  {
+    intent: "sync_gcfi",
+    label: "Sync GCFI",
+    permission: "sync_gcfi",
+    patterns: [/sync.*gcfi/i, /gcfi.*sync/i, /sync.*government contractor/i],
+    sample: "Sync GCFI",
+  },
+  {
+    intent: "show_gcfi_health",
+    label: "Show GCFI health",
+    permission: "view_gcfi",
+    patterns: [/gcfi.*health/i, /health.*gcfi/i, /government contractor.*health/i],
+    sample: "Show GCFI health",
+  },
+  {
+    intent: "show_gcfi_decisions",
+    label: "Show GCFI decisions",
+    permission: "view_gcfi",
+    patterns: [/gcfi.*decision/i, /government contractor.*decision/i],
+    sample: "Show GCFI decisions",
+  },
+  {
+    intent: "show_gcfi_audit_events",
+    label: "Show GCFI audit events",
+    permission: "view_gcfi",
+    patterns: [/gcfi.*audit/i, /government contractor.*audit/i],
+    sample: "Show GCFI audit events",
+  },
   {
     intent: "sync_complianceflow",
     label: "Sync ComplianceFlow",
