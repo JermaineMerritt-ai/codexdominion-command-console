@@ -8,18 +8,30 @@ import {
   nextStates,
   WORKFLOW_STATE_LABELS,
 } from "@/lib/governance/transitions";
-import type { WorkflowState } from "@/types";
+import { can } from "@/lib/governance/rbac";
+import type { UserRole, WorkflowState } from "@/types";
 
 export function WorkflowActions({
   workflowId,
   state,
+  role,
 }: {
   workflowId: string;
   state: WorkflowState;
+  role: UserRole;
 }) {
   const [pending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string | null>(null);
   const options = nextStates(state);
+
+  if (!can(role, "transition_workflow")) {
+    if (options.length === 0) return null;
+    return (
+      <p className="mt-3 border-t pt-3 text-xs text-muted-foreground">
+        Your role cannot transition workflows.
+      </p>
+    );
+  }
 
   if (options.length === 0) {
     return (

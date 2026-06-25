@@ -66,6 +66,28 @@ The console is **operational**, not read-only. Every action runs as a validated
 Inputs are validated with Zod; see [docs/audit-events.md](docs/audit-events.md)
 and [docs/sprint-02.md](docs/sprint-02.md). Run the action tests with `npm test`.
 
+## 🔐 Authentication & RBAC
+
+Authentication is an **opt-in layer** — the demo stays open by default.
+
+- `NEXT_PUBLIC_REQUIRE_AUTH=false` (default): open; actor = seeded administrator.
+- `NEXT_PUBLIC_REQUIRE_AUTH=true` + Supabase keys: routes gated behind `/login`,
+  session-bound, sign-out from the user menu.
+
+Every governance action is **enforced server-side** by role. `can(role, action)`
+is shared by the server (enforcement) and the UI (hides/disables controls), and
+**denied attempts are audited** as `authorization.denied`.
+
+| Action | Allowed roles |
+| --- | --- |
+| Approve / Deny decision | Administrator, Compliance Officer, Reviewer |
+| Transition workflow | Administrator, Compliance Officer |
+| Publish / Archive policy | Administrator, Compliance Officer |
+| Complete vendor review | Administrator, Compliance Officer, Reviewer |
+| Generate evidence pack | Administrator, Compliance Officer, Auditor |
+
+See [docs/rbac.md](docs/rbac.md) and [docs/auth.md](docs/auth.md).
+
 ## 🔀 Data source modes
 
 A single switch (`NEXT_PUBLIC_APP_MODE`) selects where data comes from. Pages
@@ -126,11 +148,12 @@ docs/           Architecture, data model, API, deployment, roadmap
 - [Data Model](docs/data-model.md)
 - [API & Server Actions](docs/api.md)
 - [Security](docs/security.md)
+- [Authentication](docs/auth.md) · [RBAC](docs/rbac.md)
 - [Compliance Mapping](docs/compliance.md)
 - [Audit Events](docs/audit-events.md)
 - [Deployment](docs/deployment.md)
 - [Roadmap](docs/roadmap.md)
-- [Sprint 01](docs/sprint-01.md) · [Sprint 02](docs/sprint-02.md)
+- [Sprint 01](docs/sprint-01.md) · [Sprint 02](docs/sprint-02.md) · [Sprint 03](docs/sprint-03.md)
 - [Demo Script](docs/demo-script.md)
 - [Contributing](CONTRIBUTING.md)
 

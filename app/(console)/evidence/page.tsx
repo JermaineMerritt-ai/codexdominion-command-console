@@ -16,6 +16,7 @@ import {
   getUsersById,
   nameOf,
 } from "@/lib/data/queries";
+import { getCurrentActor } from "@/lib/auth/actor";
 import { formatDateTime, shortHash } from "@/lib/utils";
 
 export const metadata = { title: "Evidence" };
@@ -23,10 +24,11 @@ export const metadata = { title: "Evidence" };
 const FORMAT_ICON = { JSON: FileJson, PDF: FileText, ZIP: FileArchive };
 
 export default async function EvidencePage() {
-  const [packs, allDecisions, users] = await Promise.all([
+  const [packs, allDecisions, users, actor] = await Promise.all([
     getEvidencePacks(),
     getDecisions(),
     getUsersById(),
+    getCurrentActor(),
   ]);
   const decisions = allDecisions.map((d) => ({
     id: d.id,
@@ -44,7 +46,7 @@ export default async function EvidencePage() {
         title="Evidence Pack Generator"
         description="Tamper-evident, hash-chained evidence packs bundling decision history, approvals, policy checks, and audit events for examination."
       >
-        <EvidenceGenerator decisions={decisions} />
+        <EvidenceGenerator decisions={decisions} role={actor.role} />
       </PageHeader>
 
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">

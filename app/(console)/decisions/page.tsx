@@ -12,14 +12,16 @@ import {
   getUsersById,
   nameOf,
 } from "@/lib/data/queries";
+import { getCurrentActor } from "@/lib/auth/actor";
 
 export const metadata = { title: "Decision Center" };
 
 export default async function DecisionsPage() {
-  const [org, decisions, users] = await Promise.all([
+  const [org, decisions, users, actor] = await Promise.all([
     getActiveOrganization(),
     getDecisions(),
     getUsersById(),
+    getCurrentActor(),
   ]);
   const rows: DecisionRow[] = decisions.map((d) => ({
     ...d,
@@ -57,7 +59,7 @@ export default async function DecisionsPage() {
 
       <Card>
         <CardContent className="pt-5">
-          <DecisionsTable data={rows} />
+          <DecisionsTable data={rows} role={actor.role} />
         </CardContent>
       </Card>
     </div>

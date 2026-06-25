@@ -13,7 +13,8 @@ import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { generateEvidencePackRecord } from "@/lib/actions/governance";
-import type { Decision } from "@/types";
+import { can } from "@/lib/governance/rbac";
+import type { Decision, UserRole } from "@/types";
 import { formatDateTime } from "@/lib/utils";
 
 interface Props {
@@ -21,6 +22,7 @@ interface Props {
     Decision,
     "id" | "aiSystem" | "policyRule" | "outcome" | "riskLevel" | "timestamp" | "evidenceHash"
   >[];
+  role: UserRole;
 }
 
 type Phase = "select" | "generating" | "done";
@@ -33,7 +35,8 @@ const STEPS = [
   "Sealing & packaging",
 ];
 
-export function EvidenceGenerator({ decisions }: Props) {
+export function EvidenceGenerator({ decisions, role }: Props) {
+  const canSave = can(role, "generate_evidence_pack");
   const [open, setOpen] = React.useState(false);
   const [phase, setPhase] = React.useState<Phase>("select");
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
@@ -277,7 +280,7 @@ export function EvidenceGenerator({ decisions }: Props) {
                     <Button size="sm" variant="outline" onClick={downloadJson}>
                       <Download className="h-4 w-4" /> Download JSON
                     </Button>
-                    {!savedId && (
+                    {canSave && !savedId && (
                       <Button size="sm" onClick={saveRecord} disabled={saving}>
                         {saving ? (
                           <Loader2 className="h-4 w-4 animate-spin" />

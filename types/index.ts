@@ -60,7 +60,8 @@ export type AuditEventType =
   | "evidence.generated"
   | "vendor.reviewed"
   | "workflow.transitioned"
-  | "user.role_changed";
+  | "user.role_changed"
+  | "authorization.denied";
 
 /** Entity a mutation/audit event targets. */
 export type AuditEntityType =

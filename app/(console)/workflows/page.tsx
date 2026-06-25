@@ -8,6 +8,7 @@ import {
 import { StatusBadge } from "@/components/ui/status-badge";
 import { WorkflowActions } from "@/components/workflows/workflow-actions";
 import { getUsersById, getWorkflows, nameOf } from "@/lib/data/queries";
+import { getCurrentActor } from "@/lib/auth/actor";
 import { formatDateTime } from "@/lib/utils";
 import type { WorkflowState } from "@/types";
 
@@ -31,9 +32,10 @@ const STATE_ORDER: (WorkflowState | "created")[] = [
 ];
 
 export default async function WorkflowsPage() {
-  const [workflows, users] = await Promise.all([
+  const [workflows, users, actor] = await Promise.all([
     getWorkflows(),
     getUsersById(),
+    getCurrentActor(),
   ]);
   const counts = {
     active: workflows.filter(
@@ -133,7 +135,11 @@ export default async function WorkflowsPage() {
                 ))}
               </ol>
 
-              <WorkflowActions workflowId={w.id} state={w.state} />
+              <WorkflowActions
+                workflowId={w.id}
+                state={w.state}
+                role={actor.role}
+              />
             </CardContent>
           </Card>
         ))}

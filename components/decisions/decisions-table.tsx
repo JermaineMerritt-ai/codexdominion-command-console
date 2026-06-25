@@ -6,7 +6,7 @@ import { DataTable } from "@/components/data-table/data-table";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { DecisionActions } from "@/components/decisions/decision-actions";
 import { formatDateTime, shortHash } from "@/lib/utils";
-import type { Decision } from "@/types";
+import type { Decision, UserRole } from "@/types";
 
 export interface DecisionRow extends Decision {
   reviewerName: string;
@@ -81,7 +81,13 @@ const columns: ColumnDef<DecisionRow, unknown>[] = [
   },
 ];
 
-export function DecisionsTable({ data }: { data: DecisionRow[] }) {
+export function DecisionsTable({
+  data,
+  role,
+}: {
+  data: DecisionRow[];
+  role: UserRole;
+}) {
   return (
     <DataTable
       columns={columns}
@@ -115,7 +121,11 @@ export function DecisionsTable({ data }: { data: DecisionRow[] }) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Reviewer Action
             </p>
-            <DecisionActions decisionId={d.id} outcome={d.outcome} />
+            <DecisionActions
+              decisionId={d.id}
+              outcome={d.outcome}
+              role={role}
+            />
           </div>
         </div>
       )}

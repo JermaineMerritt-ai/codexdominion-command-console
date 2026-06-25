@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { VendorActions } from "@/components/vendors/vendor-actions";
 import { getUsersById, getVendors, nameOf } from "@/lib/data/queries";
+import { getCurrentActor } from "@/lib/auth/actor";
 import { formatDate } from "@/lib/utils";
 import type { ComplianceState } from "@/types";
 
@@ -44,7 +45,11 @@ function isExpiringSoon(iso: string) {
 }
 
 export default async function VendorsPage() {
-  const [vendors, users] = await Promise.all([getVendors(), getUsersById()]);
+  const [vendors, users, actor] = await Promise.all([
+    getVendors(),
+    getUsersById(),
+    getCurrentActor(),
+  ]);
   const highRisk = vendors.filter((v) => v.riskScore >= 60).length;
   const expiring = vendors.filter((v) => isExpiringSoon(v.contractExpiresAt)).length;
 
@@ -139,7 +144,11 @@ export default async function VendorsPage() {
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex justify-end">
-                        <VendorActions vendorId={v.id} status={v.status} />
+                        <VendorActions
+                          vendorId={v.id}
+                          status={v.status}
+                          role={actor.role}
+                        />
                       </div>
                     </td>
                   </tr>

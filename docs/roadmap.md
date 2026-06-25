@@ -27,6 +27,37 @@
 - SAM.gov / opportunity ingestion for procurement
 - Notification delivery (email / Slack / webhook)
 
+## 🧭 Vision — Command Workspace (natural-language control plane)
+
+Evolve the console from page navigation to a **governed command interface**. A
+top-level **Command** page with a prompt bar where users describe intent:
+
+> "Generate an evidence package for all denied AI decisions this month."
+> "Review this vendor for HIPAA readiness." · "Explain why DEC-2026-0480 was denied."
+
+Each command routes through the **same governed pipeline** built in Sprints
+01–03: interpret → determine module(s) → **apply RBAC + policy** → execute
+permitted actions → **write audit events** → return result *with* supporting
+evidence. The command bar is a new surface over the existing governed actions —
+not a bypass of them.
+
+Proposed navigation grouping:
+`Home · Dashboard · Command · Governance (Decisions/Policies/Evidence/Workflows)
+· Operations (Procurement/Vendors/Contracts/Grants) · Solutions (industry
+modules) · Administration (Users/Orgs/Integrations/Settings)`.
+
+## 🧩 Vision — Platform tiers
+
+Position the portfolio as one platform: **Tier 1 Platform** (this Console +
+codex-control-plane engine + shared core/SDK + docs), **Tier 2 Modules**
+(ComplianceFlow, ClinicalFlow, GrantOps, Gov Contractor Financial, EscrowFlow,
+Procurement Network, CareLedger, Justice) integrated in that order, and **Tier 3
+shared services**. Every module emits the same governed artifacts — decisions,
+workflows, evidence, audit events, risk — so the Console presents one unified
+operational view regardless of domain. Integration sequence: control-plane →
+ComplianceFlow → GrantOps → Gov Contractor → EscrowFlow → ClinicalFlow →
+Procurement → CareLedger → Justice.
+
 ## 🏛 Phase 4 — Enterprise & compliance
 - SSO (SAML / OIDC) and SCIM provisioning
 - FedRAMP / StateRAMP control mapping and continuous evidence

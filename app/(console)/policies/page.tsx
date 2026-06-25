@@ -6,14 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { PolicyActions } from "@/components/policies/policy-actions";
 import { getPolicies, getUsersById, nameOf } from "@/lib/data/queries";
+import { getCurrentActor } from "@/lib/auth/actor";
 import { formatDate } from "@/lib/utils";
 
 export const metadata = { title: "Policies" };
 
 export default async function PoliciesPage() {
-  const [policies, users] = await Promise.all([
+  const [policies, users, actor] = await Promise.all([
     getPolicies(),
     getUsersById(),
+    getCurrentActor(),
   ]);
   const published = policies.filter((p) => p.status === "published").length;
   const draft = policies.filter((p) => p.status === "draft").length;
@@ -78,7 +80,11 @@ export default async function PoliciesPage() {
                     {formatDate(p.lastUpdated)}
                   </td>
                   <td className="px-5 py-3">
-                    <PolicyActions policyId={p.id} status={p.status} />
+                    <PolicyActions
+                      policyId={p.id}
+                      status={p.status}
+                      role={actor.role}
+                    />
                   </td>
                 </tr>
               ))}

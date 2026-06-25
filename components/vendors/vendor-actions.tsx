@@ -4,14 +4,17 @@ import * as React from "react";
 import { ShieldCheck, Loader2, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { completeVendorReview } from "@/lib/actions/governance";
-import type { VendorStatus } from "@/types";
+import { can } from "@/lib/governance/rbac";
+import type { UserRole, VendorStatus } from "@/types";
 
 export function VendorActions({
   vendorId,
   status,
+  role,
 }: {
   vendorId: string;
   status: VendorStatus;
+  role: UserRole;
 }) {
   const [pending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string | null>(null);
@@ -23,6 +26,10 @@ export function VendorActions({
         <Check className="h-3.5 w-3.5" /> Reviewed
       </span>
     );
+  }
+
+  if (!can(role, "complete_vendor_review")) {
+    return <span className="text-xs text-muted-foreground">—</span>;
   }
 
   function run() {

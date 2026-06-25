@@ -4,9 +4,11 @@ import { demoStore, latestDemoHash } from "./demo-store";
 import { buildAuditEvent, computeEvidenceHash } from "@/lib/governance/audit";
 import { canTransition } from "@/lib/governance/transitions";
 import type {
+  AuditEntityType,
   Decision,
   EvidencePack,
   Policy,
+  UserRole,
   Vendor,
   Workflow,
   WorkflowState,
@@ -16,6 +18,7 @@ export interface Actor {
   id: string;
   name: string;
   organizationId: string;
+  role: UserRole;
 }
 
 export interface GovernanceMutations {
@@ -34,6 +37,13 @@ export interface GovernanceMutations {
     input: { title: string; decisionIds: string[]; formats: ("JSON" | "PDF" | "ZIP")[] },
     actor: Actor,
   ): Promise<EvidencePack>;
+  /** Record a blocked attempt (RBAC denial) in the audit trail. */
+  auditAuthorizationDenied(
+    actor: Actor,
+    action: string,
+    entityType: AuditEntityType,
+    entityId: string,
+  ): Promise<void>;
 }
 
 const now = () => new Date().toISOString();
@@ -233,6 +243,20 @@ export const demoMutations: GovernanceMutations = {
       afterState: { hash, decisions: input.decisionIds.length },
     });
     return pack;
+  },
+
+  async auditAuthorizationDenied(actor, action, entityType, entityId) {
+    appendAudit({
+      type: "authorization.denied",
+      action,
+      actor,
+      organizationId: actor.organizationId,
+      entityType,
+      entityId,
+      summary: `Authorization denied: ${actor.role} attempted ${action} on ${entityId}`,
+      beforeState: { role: actor.role },
+      afterState: { blocked: true },
+    });
   },
 };
 

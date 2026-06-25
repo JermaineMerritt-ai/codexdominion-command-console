@@ -10,6 +10,7 @@ interface AppShellProps {
   notifications: Notification[];
   user: User;
   organization: Organization;
+  authEnabled?: boolean;
 }
 
 export function AppShell({
@@ -17,6 +18,7 @@ export function AppShell({
   notifications,
   user,
   organization,
+  authEnabled = false,
 }: AppShellProps) {
   const [menuOpen, setMenuOpen] = React.useState(false);
 
@@ -29,6 +31,7 @@ export function AppShell({
           notifications={notifications}
           user={user}
           organization={organization}
+          authEnabled={authEnabled}
         />
         <main className="mx-auto w-full max-w-[1500px] px-4 py-6 lg:px-8 lg:py-8">
           {children}

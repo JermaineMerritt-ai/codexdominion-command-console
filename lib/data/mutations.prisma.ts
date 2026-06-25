@@ -276,6 +276,23 @@ export const prismaMutations: GovernanceMutations = {
       } satisfies EvidencePack;
     });
   },
+
+  async auditAuthorizationDenied(actor, action, entityType, entityId) {
+    await prisma.$transaction(async (tx) => {
+      await writeAudit(tx, {
+        type: "authorization.denied",
+        action,
+        actor,
+        organizationId: actor.organizationId,
+        entityType,
+        entityId,
+        summary: `Authorization denied: ${actor.role} attempted ${action} on ${entityId}`,
+        beforeState: { role: actor.role },
+        afterState: { blocked: true },
+        at: now(),
+      });
+    });
+  },
 };
 
 async function setPolicyStatus(

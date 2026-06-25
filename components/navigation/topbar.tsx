@@ -4,6 +4,8 @@ import { Menu } from "lucide-react";
 import { GlobalSearch } from "./global-search";
 import { NotificationsMenu } from "./notifications-menu";
 import { ThemeToggle } from "./theme-toggle";
+import { UserMenu } from "./user-menu";
+import { ROLE_LABELS } from "@/lib/governance/rbac";
 import type { Notification, Organization, User } from "@/types";
 
 interface TopbarProps {
@@ -11,6 +13,7 @@ interface TopbarProps {
   notifications: Notification[];
   user: User;
   organization: Organization;
+  authEnabled: boolean;
 }
 
 export function Topbar({
@@ -18,13 +21,8 @@ export function Topbar({
   notifications,
   user,
   organization,
+  authEnabled,
 }: TopbarProps) {
-  const initials = user.name
-    .split(" ")
-    .map((p) => p[0])
-    .slice(0, 2)
-    .join("");
-
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur lg:px-6">
       <button
@@ -40,7 +38,7 @@ export function Topbar({
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-1.5 md:flex-none">
-        <div className="mr-2 hidden text-right sm:block">
+        <div className="mr-1 hidden text-right sm:block">
           <p className="text-xs font-medium leading-tight">
             {organization.name}
           </p>
@@ -48,15 +46,15 @@ export function Topbar({
             {organization.sector} · {organization.tier}
           </p>
         </div>
+        <span
+          className="mr-1 hidden rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary md:inline"
+          title="Your role"
+        >
+          {ROLE_LABELS[user.role]}
+        </span>
         <NotificationsMenu notifications={notifications} />
         <ThemeToggle />
-        <div
-          className="ml-1 flex h-9 w-9 items-center justify-center rounded-full text-xs font-semibold text-white"
-          style={{ backgroundColor: user.avatarColor }}
-          title={`${user.name} · ${user.title}`}
-        >
-          {initials}
-        </div>
+        <UserMenu user={user} authEnabled={authEnabled} />
       </div>
     </header>
   );

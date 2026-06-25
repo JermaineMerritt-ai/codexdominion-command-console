@@ -5,18 +5,22 @@ import { Check, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { approveDecision, denyDecision } from "@/lib/actions/governance";
 import type { ActionResult } from "@/lib/actions/governance";
-import type { DecisionOutcome } from "@/types";
+import { can } from "@/lib/governance/rbac";
+import type { DecisionOutcome, UserRole } from "@/types";
 
 export function DecisionActions({
   decisionId,
   outcome,
+  role,
 }: {
   decisionId: string;
   outcome: DecisionOutcome;
+  role: UserRole;
 }) {
   const [pending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string | null>(null);
 
+  const allowed = can(role, "approve_decision");
   const actionable = outcome === "flagged" || outcome === "escalated";
 
   function run(fn: (i: { decisionId: string }) => Promise<ActionResult>) {
@@ -32,6 +36,14 @@ export function DecisionActions({
       <p className="text-xs text-muted-foreground">
         No reviewer action required — decision is{" "}
         <span className="font-medium">{outcome}</span>.
+      </p>
+    );
+  }
+
+  if (!allowed) {
+    return (
+      <p className="text-xs text-muted-foreground">
+        Your role cannot approve or deny decisions.
       </p>
     );
   }

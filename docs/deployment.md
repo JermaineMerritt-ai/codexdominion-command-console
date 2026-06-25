@@ -54,6 +54,15 @@ Vercel builds with `npm run build`. With `NEXT_PUBLIC_APP_MODE=database`, pages
 read live data through Prisma; the auth middleware activates once
 `NEXT_PUBLIC_REQUIRE_AUTH=true` and Supabase keys are present.
 
+### 5. Enable authentication (optional)
+Set `NEXT_PUBLIC_REQUIRE_AUTH=true`, then create Supabase Auth users whose
+**email** matches an application user (seed/`users` table) — that mapping assigns
+the role. Unmatched accounts get least-privilege `viewer`. See
+[auth.md](auth.md) and [rbac.md](rbac.md).
+
+> Middleware **fails open** if `REQUIRE_AUTH=true` but Supabase keys are missing
+> — always set the keys when enabling auth.
+
 ## Rollback / safety
 
 Switching `NEXT_PUBLIC_APP_MODE` back to `demo` instantly restores the
