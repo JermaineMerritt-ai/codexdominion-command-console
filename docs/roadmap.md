@@ -57,13 +57,17 @@ Government Contractor Financial Infrastructure bound via the shared adapter, wit
 contract-milestone and payment-approval risk commands. See
 [live-gcfi-binding.md](live-gcfi-binding.md).
 
+### ✅ AI Execution Plans — delivered (Sprint 10)
+Multi-step, human-approved, audited plans that orchestrate across modules
+(propose → approve → execute → audit). See
+[execution-plans.md](execution-plans.md).
+
 ### Proposed forward sequence
-- **Sprint 10** — Real provider integration (Claude/ChatGPT) behind the abstraction
-- **Sprint 11** — Bind procurement / CareLedger to round out verticals
-- **Sprint 12** — Multi-step plan execution (run each planned intent, governed)
-- **Sprint 13** — Multi-organization (tenants / workspaces)
-- **Sprint 14** — Enterprise SSO (Entra ID, Okta) + SCIM
-- **Sprint 15** — Research provider integration
+- **Sprint 11** — Real Claude API (LLM **proposes** plans; execution stays governed)
+- **Sprint 12** — Real ChatGPT API behind the provider abstraction
+- **Sprint 13** — Microsoft 365 Copilot (document/report generation)
+- **Sprint 14** — Cross-module autonomous workflows (conditional steps, retries)
+- **Sprint 15** — Marketplace / SDK for third-party governed modules
 
 ### Original vision (reference)
 

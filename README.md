@@ -115,6 +115,25 @@ risk. See [control-plane](docs/live-control-plane-binding.md),
 [ComplianceFlow](docs/live-complianceflow-binding.md), and
 [GCFI](docs/live-gcfi-binding.md) bindings.
 
+## 🤖 AI Execution Plans
+
+The workspace is **autonomous, not a chatbot**: a high-level prompt proposes a
+**multi-step plan**, a human approves it, and the platform executes each step
+across modules — auditing everything.
+
+```
+"Prepare for a FedRAMP assessment"
+  → Execution Plan (6 steps · ~12 min · risk: medium · ComplianceFlow, control-plane, Vendors, Evidence)
+  → Approve & Execute   (RBAC: execute_plan — Administrator / Compliance Officer)
+  → each step runs as a governed command (command.executed audit)
+  → executive report + plan.executed audit (sealed)
+```
+
+**AI proposes · human approves · platform executes · everything audited.** Plans:
+FedRAMP readiness, HIPAA audit prep, contractor payment risk, procurement
+posture, AI governance posture, executive briefing, pilot readiness. See
+[docs/execution-plans.md](docs/execution-plans.md).
+
 ## ⚙️ Live governance actions
 
 The console is **operational**, not read-only. Every action runs as a validated
@@ -223,9 +242,10 @@ docs/           Architecture, data model, API, deployment, roadmap
 - [Command Workspace](docs/command-workspace.md) · [AI Provider Routing](docs/ai-provider-routing.md)
 - [Module Registry](docs/module-registry.md) · [Integration Contract](docs/integration-contract.md)
 - Live bindings: [control-plane](docs/live-control-plane-binding.md) · [ComplianceFlow](docs/live-complianceflow-binding.md) · [GCFI](docs/live-gcfi-binding.md)
+- [AI Execution Plans](docs/execution-plans.md)
 - [Deployment](docs/deployment.md)
 - [Roadmap](docs/roadmap.md)
-- [Sprint 01](docs/sprint-01.md) · [02](docs/sprint-02.md) · [03](docs/sprint-03.md) · [04](docs/sprint-04.md) · [05](docs/sprint-05.md) · [06](docs/sprint-06.md) · [07](docs/sprint-07.md) · [08](docs/sprint-08.md) · [09](docs/sprint-09.md)
+- [Sprint 01](docs/sprint-01.md) · [02](docs/sprint-02.md) · [03](docs/sprint-03.md) · [04](docs/sprint-04.md) · [05](docs/sprint-05.md) · [06](docs/sprint-06.md) · [07](docs/sprint-07.md) · [08](docs/sprint-08.md) · [09](docs/sprint-09.md) · [10](docs/sprint-10.md)
 - [Demo Script](docs/demo-script.md)
 - [Contributing](CONTRIBUTING.md)
 

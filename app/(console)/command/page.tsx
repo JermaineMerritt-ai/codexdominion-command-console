@@ -2,6 +2,7 @@ import { PageHeader } from "@/components/page-header";
 import { CommandWorkspace } from "@/components/command/command-workspace";
 import { getCurrentActor } from "@/lib/auth/actor";
 import { SUGGESTED_PROMPTS } from "@/lib/command/intents";
+import { PLAN_SUGGESTIONS } from "@/lib/execution/plans";
 import { PROVIDER_INFO } from "@/lib/providers/registry";
 
 export const metadata = { title: "Command" };
@@ -18,6 +19,7 @@ export default async function CommandPage() {
       <CommandWorkspace
         role={actor.role}
         suggestions={SUGGESTED_PROMPTS}
+        planSuggestions={PLAN_SUGGESTIONS}
         providers={PROVIDER_INFO}
       />
     </div>

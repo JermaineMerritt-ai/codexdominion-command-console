@@ -17,7 +17,8 @@ export type GovernanceAction =
   | "sync_complianceflow"
   | "view_complianceflow"
   | "sync_gcfi"
-  | "view_gcfi";
+  | "view_gcfi"
+  | "execute_plan";
 
 /** Which roles may perform each action (server-enforced, also drives the UI). */
 export const ACTION_ROLES: Record<GovernanceAction, UserRole[]> = {
@@ -34,6 +35,7 @@ export const ACTION_ROLES: Record<GovernanceAction, UserRole[]> = {
   view_complianceflow: ["administrator", "compliance_officer", "reviewer", "auditor"],
   sync_gcfi: ["administrator", "compliance_officer"],
   view_gcfi: ["administrator", "compliance_officer", "reviewer", "auditor"],
+  execute_plan: ["administrator", "compliance_officer"],
 };
 
 export function can(role: UserRole, action: GovernanceAction): boolean {
@@ -54,6 +56,7 @@ export const ACTION_LABELS: Record<GovernanceAction, string> = {
   view_complianceflow: "view live ComplianceFlow data",
   sync_gcfi: "sync GCFI",
   view_gcfi: "view live GCFI data",
+  execute_plan: "execute AI execution plans",
 };
 
 export const ROLE_LABELS: Record<UserRole, string> = {

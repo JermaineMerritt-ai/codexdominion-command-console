@@ -335,6 +335,48 @@ export const prismaMutations: GovernanceMutations = {
       return ev;
     });
   },
+
+  async recordPlanExecuted(actor, args) {
+    return prisma.$transaction(async (tx) => {
+      const prev = await tx.auditEvent.findFirst({
+        where: { organizationId: actor.organizationId },
+        orderBy: { at: "desc" },
+      });
+      const at = now();
+      const ev = buildAuditEvent({
+        type: "plan.executed",
+        action: "execute_plan",
+        actorId: actor.id,
+        organizationId: actor.organizationId,
+        entityType: "execution_plan",
+        entityId: args.planId,
+        summary: `Plan executed: ${args.title} (${args.stepCount} steps) — ${args.summary}`,
+        beforeState: null,
+        afterState: { planId: args.planId, steps: args.stepCount },
+        prevHash: prev?.hash ?? "0x0",
+        at: iso(at),
+      });
+      await tx.auditEvent.create({
+        data: {
+          id: ev.id,
+          type: ev.type,
+          target: ev.target,
+          summary: ev.summary,
+          hash: ev.hash,
+          prevHash: ev.prevHash,
+          at,
+          action: ev.action,
+          entityType: ev.entityType,
+          entityId: ev.entityId,
+          afterState: (ev.afterState ?? undefined) as never,
+          evidenceHash: ev.evidenceHash,
+          organizationId: actor.organizationId,
+          actorId: actor.id,
+        },
+      });
+      return ev;
+    });
+  },
 };
 
 async function setPolicyStatus(

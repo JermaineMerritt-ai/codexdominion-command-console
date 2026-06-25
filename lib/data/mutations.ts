@@ -55,6 +55,16 @@ export interface GovernanceMutations {
       afterState: Record<string, unknown>;
     },
   ): Promise<AuditEvent>;
+  /** Record an AI execution-plan run; returns the audit event. */
+  recordPlanExecuted(
+    actor: Actor,
+    args: {
+      planId: string;
+      title: string;
+      summary: string;
+      stepCount: number;
+    },
+  ): Promise<AuditEvent>;
 }
 
 const now = () => new Date().toISOString();
@@ -281,6 +291,20 @@ export const demoMutations: GovernanceMutations = {
       summary: `Command: "${args.prompt}" → ${args.summary}`,
       beforeState: null,
       afterState: args.afterState,
+    });
+  },
+
+  async recordPlanExecuted(actor, args) {
+    return appendAudit({
+      type: "plan.executed",
+      action: "execute_plan",
+      actor,
+      organizationId: actor.organizationId,
+      entityType: "execution_plan",
+      entityId: args.planId,
+      summary: `Plan executed: ${args.title} (${args.stepCount} steps) — ${args.summary}`,
+      beforeState: null,
+      afterState: { planId: args.planId, steps: args.stepCount },
     });
   },
 };

@@ -15,14 +15,22 @@ import {
   History,
   Cpu,
   Circle,
+  ListChecks,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { executeCommand } from "@/lib/actions/command";
+import { executePlan } from "@/lib/actions/execution";
+import { buildExecutionPlan } from "@/lib/execution/plans";
+import {
+  ExecutionPlanCard,
+  ExecutionRunCard,
+} from "@/components/command/execution-plan";
 import { ROLE_LABELS } from "@/lib/governance/rbac";
 import type { CommandResult } from "@/lib/command/engine";
+import type { ExecutionPlan, ExecutionRun } from "@/lib/execution/types";
 import type { ProviderInfo } from "@/lib/providers/types";
 import type { UserRole } from "@/types";
 import { cn } from "@/lib/utils";
@@ -65,25 +73,55 @@ function providerStatus(p: ProviderInfo) {
 export function CommandWorkspace({
   role,
   suggestions,
+  planSuggestions,
   providers,
 }: {
   role: UserRole;
   suggestions: string[];
+  planSuggestions: string[];
   providers: ProviderInfo[];
 }) {
   const [input, setInput] = React.useState("");
   const [provider, setProvider] = React.useState("codex");
   const [history, setHistory] = React.useState<CommandResult[]>([]);
   const [pending, startTransition] = React.useTransition();
+  const [plan, setPlan] = React.useState<ExecutionPlan | null>(null);
+  const [run, setRun] = React.useState<ExecutionRun | null>(null);
+  const [executing, setExecuting] = React.useState(false);
+  const [planError, setPlanError] = React.useState<string | null>(null);
 
-  function run(prompt: string) {
+  function submit(prompt: string) {
     const text = prompt.trim();
     if (!text) return;
     setInput("");
+    setPlanError(null);
+    // A prompt that matches a plan template proposes a plan (human approves
+    // before anything executes). Otherwise it runs as a single command.
+    const proposed = buildExecutionPlan(text);
+    if (proposed) {
+      setRun(null);
+      setPlan(proposed);
+      return;
+    }
     startTransition(async () => {
       const result = await executeCommand(text, provider);
       setHistory((h) => [result, ...h]);
     });
+  }
+
+  function approvePlan(approved: ExecutionPlan) {
+    setExecuting(true);
+    setPlanError(null);
+    executePlan(approved)
+      .then((res) => {
+        if (res.ok) {
+          setRun(res.run);
+          setPlan(null);
+        } else {
+          setPlanError(res.error);
+        }
+      })
+      .finally(() => setExecuting(false));
   }
 
   const latest = history[0];
@@ -96,7 +134,7 @@ export function CommandWorkspace({
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                run(input);
+                submit(input);
               }}
             >
               <div className="flex items-center gap-2 rounded-lg border bg-background px-3 py-2 focus-within:ring-2 focus-within:ring-ring">
@@ -104,7 +142,7 @@ export function CommandWorkspace({
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask CodexDominion…  e.g. Review system risk posture"
+                  placeholder="Ask CodexDominion…  e.g. Prepare for a FedRAMP assessment"
                   className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
                 />
                 <Button type="submit" size="sm" disabled={pending || !input.trim()}>
@@ -125,14 +163,29 @@ export function CommandWorkspace({
 
             <div className="mt-4">
               <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5" /> Suggested
+                <ListChecks className="h-3.5 w-3.5" /> Execution plans
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {planSuggestions.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => submit(s)}
+                    disabled={pending || executing}
+                    className="rounded-full border border-primary/40 bg-primary/5 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/10 disabled:opacity-50"
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+              <p className="mb-2 mt-4 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5" /> Suggested commands
               </p>
               <div className="flex flex-wrap gap-2">
                 {suggestions.map((s) => (
                   <button
                     key={s}
-                    onClick={() => run(s)}
-                    disabled={pending}
+                    onClick={() => submit(s)}
+                    disabled={pending || executing}
                     className="rounded-full border bg-background px-3 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:opacity-50"
                   >
                     {s}
@@ -142,6 +195,19 @@ export function CommandWorkspace({
             </div>
           </CardContent>
         </Card>
+
+        {plan && (
+          <ExecutionPlanCard
+            plan={plan}
+            pending={executing}
+            onApprove={approvePlan}
+            onCancel={() => setPlan(null)}
+          />
+        )}
+        {planError && (
+          <p className="text-sm text-destructive">{planError}</p>
+        )}
+        {run && <ExecutionRunCard run={run} />}
 
         {latest && (
           <Card>
