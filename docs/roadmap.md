@@ -76,8 +76,15 @@ EN/ES/FR command understanding → same canonical governed intent; localized
 responses; audit language metadata. See
 [global-command-access.md](global-command-access.md).
 
-### Proposed forward sequence
-- **Sprint 14** — Claude integration (planner only — proposes plans over the graph in any language; Codex remains the authority)
+### ✅ BankTrust OS — first industry edition — delivered (Sprint 14)
+Banking operating environment on the platform: `/banking` edition page, flagship
+module, banking execution plans (OCC/FFIEC/Fair Lending/BSA-AML), regulator
+evidence. See [banktrust-os.md](banktrust-os.md).
+
+### Proposed forward sequence (feedback-driven)
+- Additional industry editions (Healthcare/ClinicalFlow, Government)
+- Live core-banking / LOS binding for BankTrust OS
+- **Claude integration** (planner only — proposes plans over the graph; Codex remains the authority)
 - **Sprint 15** — ChatGPT integration (strategy / document generation)
 - **Sprint 16** — Microsoft 365 Copilot integration
 - **Sprint 17** — Cross-module autonomous workflows

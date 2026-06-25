@@ -115,6 +115,19 @@ risk. See [control-plane](docs/live-control-plane-binding.md),
 [ComplianceFlow](docs/live-complianceflow-binding.md), and
 [GCFI](docs/live-gcfi-binding.md) bindings.
 
+## 🏦 Industry Editions — BankTrust OS
+
+**BankTrust OS** is the first **industry edition** of CodexDominion — the AI
+Governance Operating System for community & regional banking, built on the same
+platform (not a separate product). `/banking` shows banking executive KPIs,
+banking command prompts that run through the governed pipeline, regulators
+(OCC/FDIC/Fed/FFIEC/CFPB/BSA-AML/Fair Lending/Model Risk), and the BankTrust OS
+module. "Prepare our OCC examination package" proposes a plan **grounded in the
+bank's actual posture** (SAR pending, open findings, expiring attestations).
+
+The same engine powers healthcare, government, and other regulated industries
+through industry editions. See [docs/banktrust-os.md](docs/banktrust-os.md).
+
 ## 🌐 Global Command Access
 
 Prompt CodexDominion in **English, Spanish, or French** — every language resolves
@@ -270,10 +283,11 @@ docs/           Architecture, data model, API, deployment, roadmap
 - Live bindings: [control-plane](docs/live-control-plane-binding.md) · [ComplianceFlow](docs/live-complianceflow-binding.md) · [GCFI](docs/live-gcfi-binding.md)
 - [AI Execution Plans](docs/execution-plans.md) · [Knowledge Graph](docs/knowledge-graph.md)
 - [Global Command Access](docs/global-command-access.md) · [Localization](docs/localization.md)
+- [BankTrust OS](docs/banktrust-os.md) (banking edition)
 - [Pilot Kit](docs/pilot-kit.md) · [Demo Script](docs/demo-script.md) · [Pilot Briefs](docs/pilot-briefs.md) · [Video Scripts](docs/video-scripts.md)
 - [Deployment](docs/deployment.md)
 - [Roadmap](docs/roadmap.md)
-- [Sprint 01](docs/sprint-01.md) · [02](docs/sprint-02.md) · [03](docs/sprint-03.md) · [04](docs/sprint-04.md) · [05](docs/sprint-05.md) · [06](docs/sprint-06.md) · [07](docs/sprint-07.md) · [08](docs/sprint-08.md) · [09](docs/sprint-09.md) · [10](docs/sprint-10.md) · [11](docs/sprint-11.md) · [12](docs/sprint-12.md) · [13](docs/sprint-13.md)
+- [Sprint 01](docs/sprint-01.md) · [02](docs/sprint-02.md) · [03](docs/sprint-03.md) · [04](docs/sprint-04.md) · [05](docs/sprint-05.md) · [06](docs/sprint-06.md) · [07](docs/sprint-07.md) · [08](docs/sprint-08.md) · [09](docs/sprint-09.md) · [10](docs/sprint-10.md) · [11](docs/sprint-11.md) · [12](docs/sprint-12.md) · [13](docs/sprint-13.md) · [14](docs/sprint-14.md)
 - [Demo Script](docs/demo-script.md)
 - [Contributing](CONTRIBUTING.md)
 

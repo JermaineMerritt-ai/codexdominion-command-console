@@ -76,14 +76,16 @@ export function CommandWorkspace({
   suggestions,
   planSuggestions,
   providers,
+  initialPrompt = "",
 }: {
   role: UserRole;
   suggestions: string[];
   planSuggestions: string[];
   providers: ProviderInfo[];
+  initialPrompt?: string;
 }) {
   const { locale } = useLocale();
-  const [input, setInput] = React.useState("");
+  const [input, setInput] = React.useState(initialPrompt);
   const [provider, setProvider] = React.useState("codex");
   const [history, setHistory] = React.useState<CommandResult[]>([]);
   const [pending, startTransition] = React.useTransition();

@@ -4,6 +4,7 @@ import {
   Boxes,
   Network,
   Activity,
+  Landmark,
   Gavel,
   FileCheck2,
   Building2,
@@ -59,6 +60,17 @@ export const navGroups: NavGroup[] = [
         href: "/knowledge",
         icon: Network,
         description: "Organization knowledge graph",
+      },
+    ],
+  },
+  {
+    label: "Solutions",
+    items: [
+      {
+        title: "Banking",
+        href: "/banking",
+        icon: Landmark,
+        description: "BankTrust OS — banking edition",
       },
     ],
   },

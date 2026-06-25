@@ -69,6 +69,11 @@ fair-lending checks, reviewer workflow, and a quarterly evidence pack.
 **Proof points.** SR 11-7 / fair-lending mapping · hash-chained audit · governed
 knowledge graph · live module binding path.
 
+**For banks specifically → BankTrust OS.** The banking edition (`/banking`) leads
+with banking KPIs, OCC/FFIEC/BSA-AML/Fair Lending evidence, and an OCC-examination
+plan grounded in the bank's posture. Ideal for the Jack Henry / community &
+regional banking conversation. See [banktrust-os.md](banktrust-os.md).
+
 ---
 
 ## 🌐 Multilingual

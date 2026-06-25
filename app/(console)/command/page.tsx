@@ -19,8 +19,13 @@ const CURATED_COMMANDS = [
   "Recommend next governance action",
 ];
 
-export default async function CommandPage() {
-  const actor = await getCurrentActor();
+export default async function CommandPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const [actor, params] = await Promise.all([getCurrentActor(), searchParams]);
+  const initialPrompt = typeof params.q === "string" ? params.q : "";
 
   return (
     <div>
@@ -33,6 +38,7 @@ export default async function CommandPage() {
         suggestions={CURATED_COMMANDS}
         planSuggestions={PLAN_SUGGESTIONS}
         providers={PROVIDER_INFO}
+        initialPrompt={initialPrompt}
       />
     </div>
   );
