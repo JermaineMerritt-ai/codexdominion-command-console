@@ -28,6 +28,8 @@ import {
   ExecutionRunCard,
 } from "@/components/command/execution-plan";
 import { ROLE_LABELS } from "@/lib/governance/rbac";
+import { useLocale } from "@/components/i18n/locale-provider";
+import { t, localizeIntentLabel, LOCALIZED_COMMANDS } from "@/lib/i18n";
 import type { CommandResult } from "@/lib/command/engine";
 import type { ExecutionPlan, ExecutionRun } from "@/lib/execution/types";
 import type { ProviderInfo } from "@/lib/providers/types";
@@ -80,6 +82,7 @@ export function CommandWorkspace({
   planSuggestions: string[];
   providers: ProviderInfo[];
 }) {
+  const { locale } = useLocale();
   const [input, setInput] = React.useState("");
   const [provider, setProvider] = React.useState("codex");
   const [history, setHistory] = React.useState<CommandResult[]>([]);
@@ -104,7 +107,7 @@ export function CommandWorkspace({
         setPlan(proposed);
         return;
       }
-      const result = await executeCommand(text, provider);
+      const result = await executeCommand(text, provider, locale);
       setHistory((h) => [result, ...h]);
     });
   }
@@ -157,13 +160,13 @@ export function CommandWorkspace({
             </form>
             <p className="mt-2 text-xs text-muted-foreground">
               CodexDominion governs every request — parsed, permission-checked, and
-              audited — then routes execution to the selected provider. Acting as{" "}
+              audited — then routes execution to the selected provider. {t("acting_as", locale)}{" "}
               <span className="font-medium text-foreground">{ROLE_LABELS[role]}</span>.
             </p>
 
             <div className="mt-4">
               <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                <ListChecks className="h-3.5 w-3.5" /> Execution plans
+                <ListChecks className="h-3.5 w-3.5" /> {t("execution_plans", locale)}
               </p>
               <div className="flex flex-wrap gap-2">
                 {planSuggestions.map((s) => (
@@ -178,10 +181,10 @@ export function CommandWorkspace({
                 ))}
               </div>
               <p className="mb-2 mt-4 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                <Sparkles className="h-3.5 w-3.5" /> Suggested commands
+                <Sparkles className="h-3.5 w-3.5" /> {t("suggested_commands", locale)}
               </p>
               <div className="flex flex-wrap gap-2">
-                {suggestions.map((s) => (
+                {(LOCALIZED_COMMANDS[locale] ?? suggestions).map((s) => (
                   <button
                     key={s}
                     onClick={() => submit(s)}
@@ -221,7 +224,7 @@ export function CommandWorkspace({
                   ) : (
                     <XCircle className="h-4 w-4 text-destructive" />
                   )}
-                  {latest.intentLabel}
+                  {localizeIntentLabel(latest.intent, latest.intentLabel, locale)}
                 </CardTitle>
                 <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
                   <Badge variant="default" className="gap-1">
@@ -282,7 +285,7 @@ export function CommandWorkspace({
               {latest.recommendedActions.length > 0 && (
                 <div>
                   <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Recommended actions
+                    {t("recommended_actions", locale)}
                   </p>
                   <ul className="space-y-1">
                     {latest.recommendedActions.map((a) => (
@@ -297,14 +300,14 @@ export function CommandWorkspace({
 
               {latest.nextStep && (
                 <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-sm">
-                  <span className="font-medium">Next step: </span>
+                  <span className="font-medium">{t("next_step", locale)}: </span>
                   {latest.nextStep}
                 </div>
               )}
 
               {latest.source && (
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  <span className="font-medium text-foreground">Data source:</span>
+                  <span className="font-medium text-foreground">{t("data_source", locale)}:</span>
                   <StatusBadge
                     status={
                       latest.source.connection === "connected"

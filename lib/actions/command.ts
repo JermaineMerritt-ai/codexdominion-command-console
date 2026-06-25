@@ -38,10 +38,18 @@ function makeCommandId(prompt: string, providerId: string, intent: string): stri
 export async function executeCommand(
   prompt: string,
   providerId = "codex",
+  locale = "en",
 ): Promise<CommandResult> {
   const parsed = parseCommand(prompt);
   const provider = getProvider(providerId);
   const commandId = makeCommandId(prompt, provider.id, parsed.intent);
+  // Language-access metadata for the audit trail (governance is unchanged).
+  const langMeta = {
+    inputLanguage: parsed.language,
+    responseLanguage: locale,
+    originalPrompt: prompt,
+    canonicalIntent: parsed.intent,
+  };
 
   const base = {
     commandId,
@@ -123,7 +131,7 @@ export async function executeCommand(
       intent: parsed.intent,
       prompt: parsed.prompt,
       summary,
-      afterState: { nodes: graph.stats.totalNodes, edges: graph.stats.totalEdges, gaps: graph.stats.totalGaps },
+      afterState: { nodes: graph.stats.totalNodes, edges: graph.stats.totalEdges, gaps: graph.stats.totalGaps, ...langMeta },
     });
     revalidatePath("/settings");
     return {
@@ -158,7 +166,7 @@ export async function executeCommand(
       intent: parsed.intent,
       prompt: parsed.prompt,
       summary: `Routed to ${provider.name} (not connected).`,
-      afterState: { intent: parsed.intent, provider: provider.id, executed: false },
+      afterState: { intent: parsed.intent, provider: provider.id, executed: false, ...langMeta },
     });
     revalidatePath("/settings");
     return {
@@ -206,7 +214,7 @@ export async function executeCommand(
       intent: parsed.intent,
       prompt: parsed.prompt,
       summary,
-      afterState: { intent: parsed.intent, provider: provider.id, packaged: denied.length },
+      afterState: { intent: parsed.intent, provider: provider.id, packaged: denied.length, ...langMeta },
     });
     revalidatePath("/evidence");
     revalidatePath("/dashboard");
@@ -237,6 +245,7 @@ export async function executeCommand(
       provider: provider.id,
       resultCount: body.rows.length,
       riskLevel: body.riskLevel ?? "low",
+      ...langMeta,
     },
   });
   revalidatePath("/settings");

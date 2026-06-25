@@ -1,4 +1,7 @@
 import type { GovernanceAction } from "@/lib/governance/rbac";
+import { detectLanguage } from "@/lib/i18n/detect";
+import { INTENT_SYNONYMS } from "@/lib/i18n/intent-synonyms";
+import type { Locale } from "@/lib/i18n/locales";
 
 /** Supported command intents (deterministic — no LLM). */
 export type CommandIntent =
@@ -277,11 +280,22 @@ export interface ParsedCommand {
   permission: GovernanceAction | null;
   entities: Record<string, string>;
   prompt: string;
+  /** Detected input language (governance is identical regardless). */
+  language: Locale;
 }
 
-/** Deterministically parse a prompt into a command. */
+const DEFINITION_BY_INTENT = new Map(
+  INTENT_DEFINITIONS.map((d) => [d.intent, d]),
+);
+
+/**
+ * Deterministically parse a prompt into a canonical command. English patterns
+ * match first; non-English prompts are resolved via multilingual synonyms to the
+ * SAME canonical intent. Language changes; governance does not.
+ */
 export function parseCommand(prompt: string): ParsedCommand {
   const text = prompt.trim();
+  const language = detectLanguage(text);
   const id = text.match(ID_PATTERN)?.[1];
   const entities: Record<string, string> = {};
   if (id) entities.entityId = id.toUpperCase().startsWith("DEC")
@@ -296,7 +310,24 @@ export function parseCommand(prompt: string): ParsedCommand {
         permission: def.permission,
         entities,
         prompt: text,
+        language,
       };
+    }
+  }
+
+  // Multilingual synonyms → same canonical intent.
+  for (const [intent, patterns] of Object.entries(INTENT_SYNONYMS)) {
+    if (patterns?.some((re) => re.test(text))) {
+      const def = DEFINITION_BY_INTENT.get(intent as CommandIntent);
+      if (def)
+        return {
+          intent: def.intent,
+          label: def.label,
+          permission: def.permission,
+          entities,
+          prompt: text,
+          language,
+        };
     }
   }
 
@@ -306,6 +337,7 @@ export function parseCommand(prompt: string): ParsedCommand {
     permission: null,
     entities,
     prompt: text,
+    language,
   };
 }
 

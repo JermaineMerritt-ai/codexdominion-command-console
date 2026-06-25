@@ -85,6 +85,13 @@ Go to **Diagnostics**.
 
 ---
 
+### Optional · Global Command Access (30s)
+Switch the **top-nav language** to Español, then run
+*"Muéstrame las decisiones de alto riesgo."* Same governed result —
+**"Decisiones de alto riesgo"** — same audit trail.
+> "Language changes; governance does not." (Strong for Caribbean, Canadian, and
+> multinational buyers.)
+
 ## Logistics
 - **Mode:** demo (no credentials). Reset = reload (seed is deterministic; a cold
   start clears in-session changes).

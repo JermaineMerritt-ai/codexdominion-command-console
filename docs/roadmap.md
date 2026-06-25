@@ -71,13 +71,17 @@ Diagnostics page, audit-chain verifier, curated command UX, refreshed demo
 script, and vertical pilot briefs. Consolidation before the LLM. See
 [sprint-12.md](sprint-12.md), [pilot-briefs.md](pilot-briefs.md).
 
+### ✅ Global Command Access — delivered (Sprint 13)
+EN/ES/FR command understanding → same canonical governed intent; localized
+responses; audit language metadata. See
+[global-command-access.md](global-command-access.md).
+
 ### Proposed forward sequence
-- **Sprint 13** — Multilingual Command Access (EN → ES → FR): in-language prompts → same governed intent; *language changes, governance does not*
-- **Sprint 14** — Claude integration (planner only — proposes plans over the graph; Codex remains the authority)
+- **Sprint 14** — Claude integration (planner only — proposes plans over the graph in any language; Codex remains the authority)
 - **Sprint 15** — ChatGPT integration (strategy / document generation)
 - **Sprint 16** — Microsoft 365 Copilot integration
 - **Sprint 17** — Cross-module autonomous workflows
-- **Sprint 18** — SDK + Marketplace for third-party governed modules
+- **Sprint 18** — SDK + Marketplace; additional languages (PT, NL, Haitian Creole)
 
 ### Original vision (reference)
 

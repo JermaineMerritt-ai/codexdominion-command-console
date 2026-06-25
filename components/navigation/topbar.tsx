@@ -5,6 +5,7 @@ import { GlobalSearch } from "./global-search";
 import { NotificationsMenu } from "./notifications-menu";
 import { ThemeToggle } from "./theme-toggle";
 import { UserMenu } from "./user-menu";
+import { LanguageSelector } from "@/components/i18n/language-selector";
 import { ROLE_LABELS } from "@/lib/governance/rbac";
 import type { Notification, Organization, User } from "@/types";
 
@@ -53,6 +54,7 @@ export function Topbar({
           {ROLE_LABELS[user.role]}
         </span>
         <NotificationsMenu notifications={notifications} />
+        <LanguageSelector />
         <ThemeToggle />
         <UserMenu user={user} authEnabled={authEnabled} />
       </div>

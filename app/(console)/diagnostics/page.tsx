@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import {
   Activity,
   CheckCircle2,
@@ -8,11 +9,13 @@ import {
   Network,
   ShieldCheck,
   Server,
+  Globe,
 } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { Progress } from "@/components/ui/progress";
 import { APP_MODE, dataSourceLabel } from "@/lib/config";
 import { requireAuth } from "@/lib/auth/actor";
 import { PROVIDER_INFO } from "@/lib/providers/registry";
@@ -28,11 +31,19 @@ import {
   getWorkflows,
 } from "@/lib/data/queries";
 import { verifyAuditChain } from "@/lib/governance/audit";
+import {
+  LOCALES,
+  FALLBACK_LOCALE,
+  coerceLocale,
+  translationCoverage,
+} from "@/lib/i18n";
 
 export const metadata = { title: "Diagnostics" };
 export const revalidate = 30;
 
 export default async function DiagnosticsPage() {
+  const activeLocale = coerceLocale((await cookies()).get("codex_locale")?.value);
+  const coverage = translationCoverage();
   const [modules, graph, audit, decisions, workflows, policies, vendors, evidence, users] =
     await Promise.all([
       getModules(),
@@ -143,6 +154,38 @@ export default async function DiagnosticsPage() {
             <Metric label="Entities" value={graph.stats.totalNodes} />
             <Metric label="Relationships" value={graph.stats.totalEdges} />
             <Metric label="Gaps" value={graph.stats.totalGaps} tone={graph.stats.totalGaps > 0 ? "warning" : undefined} />
+          </CardContent>
+        </Card>
+
+        {/* Language */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="h-4 w-4" /> Global Command Access
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex items-center justify-between gap-3 rounded-md border p-2.5">
+              <span className="text-sm font-medium">Active language</span>
+              <Badge variant="default">
+                {LOCALES.find((l) => l.code === activeLocale)?.nativeLabel ?? "English"}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between gap-3 text-sm">
+              <span className="text-muted-foreground">Supported</span>
+              <span>{LOCALES.map((l) => `${l.flag} ${l.nativeLabel}`).join("  ·  ")}</span>
+            </div>
+            <div className="flex items-center justify-between gap-3 text-sm">
+              <span className="text-muted-foreground">Fallback</span>
+              <span className="uppercase">{FALLBACK_LOCALE}</span>
+            </div>
+            <div>
+              <div className="mb-1 flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Translation coverage</span>
+                <span className="font-medium">{coverage}%</span>
+              </div>
+              <Progress value={coverage} />
+            </div>
           </CardContent>
         </Card>
 

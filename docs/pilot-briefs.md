@@ -71,6 +71,13 @@ knowledge graph · live module binding path.
 
 ---
 
+## 🌐 Multilingual
+
+CodexDominion supports **English, Spanish, and French** command access — every
+language resolves to the same governed intent, RBAC, and audit trail. Relevant
+for **Caribbean** markets, **Canadian** healthcare, and **multinational**
+compliance buyers. See [global-command-access.md](global-command-access.md).
+
 ## Common pilot motion
 
 1. **Demo** on the live URL (no setup) using `docs/demo-script.md`.
