@@ -4,6 +4,8 @@
 
 The Command Console is not a marketing site. It is an **operational control center** where organizations monitor AI governance, human approval workflows, policy enforcement, compliance evidence, audit trails, procurement readiness, and vendor risk — in the spirit of Azure Portal, Microsoft Defender, ServiceNow, Datadog, and the AWS Console.
 
+**🔗 Live demo (demo mode):** https://codexdominion-command-console.vercel.app
+
 ![Status](https://img.shields.io/badge/build-passing-brightgreen) ![Next.js](https://img.shields.io/badge/Next.js-15-black) ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
 
 ---

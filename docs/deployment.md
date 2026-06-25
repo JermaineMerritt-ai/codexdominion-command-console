@@ -1,5 +1,8 @@
 # Deployment
 
+> **Live production demo:** https://codexdominion-command-console.vercel.app
+> (running in demo mode — public, credential-free pilot environment).
+
 The Command Console deploys to **Vercel**. It runs in two data-source modes,
 selected by `NEXT_PUBLIC_APP_MODE` (default `demo`). **Deploy in demo mode
 first** — the public demo is the immediate sales asset; backend wiring can
