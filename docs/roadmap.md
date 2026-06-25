@@ -66,12 +66,18 @@ Multi-step, human-approved, audited plans that orchestrate across modules
 Governed knowledge graph (entities + relationships + gaps); execution plans are
 grounded in it. See [knowledge-graph.md](knowledge-graph.md).
 
+### ✅ Hardening & Demo Readiness — delivered (Sprint 12)
+Diagnostics page, audit-chain verifier, curated command UX, refreshed demo
+script, and vertical pilot briefs. Consolidation before the LLM. See
+[sprint-12.md](sprint-12.md), [pilot-briefs.md](pilot-briefs.md).
+
 ### Proposed forward sequence
-- **Sprint 12** — Claude integration (planner only — proposes plans over the graph; Codex remains the authority)
-- **Sprint 13** — ChatGPT integration (strategy / document generation)
-- **Sprint 14** — Microsoft 365 Copilot integration
-- **Sprint 15** — Cross-module autonomous workflows
-- **Sprint 16** — SDK + Marketplace for third-party governed modules
+- **Sprint 13** — Multilingual Command Access (EN → ES → FR): in-language prompts → same governed intent; *language changes, governance does not*
+- **Sprint 14** — Claude integration (planner only — proposes plans over the graph; Codex remains the authority)
+- **Sprint 15** — ChatGPT integration (strategy / document generation)
+- **Sprint 16** — Microsoft 365 Copilot integration
+- **Sprint 17** — Cross-module autonomous workflows
+- **Sprint 18** — SDK + Marketplace for third-party governed modules
 
 ### Original vision (reference)
 

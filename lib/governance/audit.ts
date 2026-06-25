@@ -10,6 +10,42 @@ export function computeEvidenceHash(payload: unknown): string {
   return "0x" + createHash("sha256").update(json).digest("hex");
 }
 
+export interface ChainVerification {
+  intact: boolean;
+  total: number;
+  roots: number;
+  danglingRefs: number;
+  duplicateHashes: number;
+}
+
+/**
+ * Verify the integrity of a hash-chained audit log. Order-independent: every
+ * non-root event's `prevHash` must reference an existing event hash, and hashes
+ * must be unique. Exactly one "root" (prevHash outside the set) is expected.
+ */
+export function verifyAuditChain(
+  events: { hash: string; prevHash: string }[],
+): ChainVerification {
+  const hashes = new Set(events.map((e) => e.hash));
+  const seen = new Set<string>();
+  let duplicateHashes = 0;
+  for (const e of events) {
+    if (seen.has(e.hash)) duplicateHashes++;
+    seen.add(e.hash);
+  }
+  const rootEvents = events.filter((e) => !hashes.has(e.prevHash));
+  const roots = rootEvents.length;
+  // Dangling = more than the single expected genesis root.
+  const danglingRefs = Math.max(0, roots - 1);
+  return {
+    intact: danglingRefs === 0 && duplicateHashes === 0,
+    total: events.length,
+    roots,
+    danglingRefs,
+    duplicateHashes,
+  };
+}
+
 export interface AuditInput {
   type: AuditEventType;
   action: string;

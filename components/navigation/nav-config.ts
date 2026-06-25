@@ -3,6 +3,7 @@ import {
   Terminal,
   Boxes,
   Network,
+  Activity,
   Gavel,
   FileCheck2,
   Building2,
@@ -115,6 +116,12 @@ export const navGroups: NavGroup[] = [
         href: "/users",
         icon: Users,
         description: "User & role management",
+      },
+      {
+        title: "Diagnostics",
+        href: "/diagnostics",
+        icon: Activity,
+        description: "System, provider & module health",
       },
       {
         title: "Settings",

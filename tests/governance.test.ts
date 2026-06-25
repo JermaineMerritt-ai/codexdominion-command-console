@@ -6,7 +6,12 @@ import {
   evidencePackSchema,
 } from "../lib/governance/validation";
 import { canTransition, nextStates } from "../lib/governance/transitions";
-import { computeEvidenceHash, buildAuditEvent } from "../lib/governance/audit";
+import {
+  computeEvidenceHash,
+  buildAuditEvent,
+  verifyAuditChain,
+} from "../lib/governance/audit";
+import { auditEvents as seedAuditEvents } from "../lib/data/seed";
 
 // ── Zod input validation ─────────────────────────────────────
 
@@ -96,6 +101,46 @@ test("buildAuditEvent populates structured fields and chains hash", () => {
   assert.equal(ev.hash, ev.evidenceHash);
   assert.match(ev.hash, /^0x[0-9a-f]{64}$/);
   assert.ok(ev.id.startsWith("AUD-"));
+});
+
+// ── Audit chain integrity ────────────────────────────────────
+
+test("verifyAuditChain accepts a well-linked chain (single root)", () => {
+  const chain = [
+    { hash: "0x3", prevHash: "0x2" },
+    { hash: "0x2", prevHash: "0x1" },
+    { hash: "0x1", prevHash: "0x0" }, // root
+  ];
+  const v = verifyAuditChain(chain);
+  assert.equal(v.intact, true);
+  assert.equal(v.roots, 1);
+  assert.equal(v.danglingRefs, 0);
+});
+
+test("verifyAuditChain flags a dangling reference", () => {
+  const chain = [
+    { hash: "0x3", prevHash: "0xZZ" }, // references nothing → extra root
+    { hash: "0x2", prevHash: "0x1" },
+    { hash: "0x1", prevHash: "0x0" },
+  ];
+  const v = verifyAuditChain(chain);
+  assert.equal(v.intact, false);
+  assert.equal(v.danglingRefs, 1);
+});
+
+test("verifyAuditChain flags duplicate hashes", () => {
+  const v = verifyAuditChain([
+    { hash: "0x1", prevHash: "0x0" },
+    { hash: "0x1", prevHash: "0x0" },
+  ]);
+  assert.equal(v.duplicateHashes, 1);
+  assert.equal(v.intact, false);
+});
+
+test("seed audit log is a single intact chain", () => {
+  const v = verifyAuditChain(seedAuditEvents);
+  assert.equal(v.intact, true);
+  assert.equal(v.roots, 1);
 });
 
 test("buildAuditEvent is deterministic for identical input", () => {

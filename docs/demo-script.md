@@ -1,94 +1,93 @@
-# 5-Minute Buyer Demo Script
+# 5–10 Minute Buyer Demo Script
 
 > Audience: enterprise / finance / healthcare / government buyers evaluating AI
-> governance tooling. Goal: show that CodexDominion turns AI oversight from a
-> spreadsheet exercise into an auditable, examiner-ready control plane.
-> Run in **demo mode** — no login, no setup, nothing to break.
+> governance. Goal: show CodexDominion is a **governed AI operating system** —
+> not a dashboard, not a chatbot. Runs on the **live demo** (no login, demo data).
 
-**Setup:** open the deployed URL (demo mode). Dark mode on. Tenant shown in the
-top bar: *Meridian Financial Group*.
+**Live:** https://codexdominion-command-console.vercel.app
+(lands on the **Command Workspace** — that's the point.)
 
 ---
 
 ### 0 · Framing (20s)
-> "This is the operational control center your risk, compliance, and audit teams
-> live in. Every AI decision your organization makes flows through here — with
-> the policy that governed it, who approved it, and tamper-evident evidence an
-> examiner can verify. Let me show you five things."
+> "This is the interface your risk, compliance, and audit teams work in. You
+> describe what you need; CodexDominion governs the request — checks permissions,
+> reasons over a governed model of your organization, executes, and proves it in
+> an audit trail. Let me show you."
 
 ---
 
-### 1 · Dashboard — governance visibility (60s)
-Land on **Dashboard**.
-- Point to the six KPI tiles: *Active Workflows, Pending Approvals, AI Decisions
-  Today, Policy Violations, Evidence Packs, High-Risk Vendors.*
-- "One screen, whole-of-org posture — the view a CRO or examiner asks for."
-- Point to **Audit Readiness: 77/100** and the compliance rollup (SR 11-7, Fair
-  Lending, Privacy…). "This score moves as you close gaps. Today fair lending is
-  the open item — watch how we drill into exactly why."
+### 1 · Command Workspace — governed autonomy (90s)
+On the home screen, click the plan chip **"Prepare for a FedRAMP assessment."**
+- A **plan** appears — *not* a chatbot reply: 6 steps, ~12 min, risk level, the
+  modules it will use, and a **"Based on your organization"** section listing
+  *your* real risks (e.g. *GCFI: payment authorization missing dual approval*).
+- "Notice: the AI **proposes**, but nothing runs until a human approves." Click
+  **Approve & Execute.**
+- Each step runs as a governed command and is **individually audited**; the run
+  ends with an executive summary and a **plan sealed in the audit trail**.
 
-**Talking point:** *visibility no spreadsheet gives you.*
-
----
-
-### 2 · Decisions — an AI action approved / denied (75s)
-Go to **Decisions**.
-- "Every automated decision, searchable and filterable." Type `fraud` in search.
-- Open **DEC-2026-0480** (FraudSentinel, *flagged, critical*). Expand the row.
-- Read the rationale: *"Adverse-impact ratio fell below the 0.80 threshold for a
-  protected segment."*
-- Point to the **evidence hash** — "cryptographically sealed, tamper-evident.
-  This is what makes a decision defensible months later."
-
-**Talking point:** *every decision is explainable and provable.*
+**Talking point:** *AI proposes · human approves · platform executes · everything audited.*
 
 ---
 
-### 3 · Evidence — generate an audit pack (75s)
-Go to **Evidence** → click **Generate Evidence Pack**.
-- Select 3–4 decisions → **Generate**. Watch the sealing steps run (collect →
-  compile → aggregate audit events → compute hash chain → seal).
-- "What used to take a compliance analyst days before an exam — assembling
-  decision history, approvals, and audit trail — is one click and a sealed hash."
-- Click **Download JSON** to show the real artifact.
+### 2 · Knowledge Graph — "how does the AI know our business?" (60s)
+Go to **Knowledge**.
+- "CodexDominion maintains a **governed knowledge graph** of your environment —
+  policies, vendors, contracts, evidence, decisions, workflows, modules, AI
+  systems — and the relationships between them." Point to entities,
+  relationships, and the **knowledge gaps** (expiring certs, missing evidence,
+  unreviewed decisions).
+- "That plan a moment ago was grounded in *this* — not raw prompts."
 
-**Talking point:** *examination evidence on demand.*
-
----
-
-### 4 · Procurement — match an opportunity to controls (60s)
-Go to **Procurement** → open **OPP-7781** (Treasury, AI Governance Platform).
-- Show **Match Score 88**, **Required Controls** (FedRAMP, NIST AI RMF, SR 11-7),
-  and the **Capability Gap** (FedRAMP in progress) with **Bid Readiness 78/100**.
-- "For public-sector buyers: we map each opportunity's required controls to your
-  actual posture, so you know what you can win today and what to close first."
-
-**Talking point:** *governance posture becomes pipeline.*
+**Talking point:** *governed context, not uploaded documents.*
 
 ---
 
-### 5 · Vendor Risk — expiring compliance gaps (50s)
-Go to **Vendors**.
-- Sorted by risk. Point to **Quanta Cloud Services (78, denied)** — red SOC 2 /
-  security. Then **VeriDesk (expiring)** with the amber expiration warning.
-- "Third-party AI risk, continuously tracked: SOC 2, HIPAA, FedRAMP, insurance,
-  and contract expirations — with warnings before they lapse."
+### 3 · Modules — the control plane governs every app (60s)
+Go to **Modules**.
+- "Every CodexDominion app reports in through one Integration Contract." Three
+  modules are **live-ready** (control-plane, ComplianceFlow, GCFI) with a
+  connection state; the rest show maturity and gaps.
+- Open **GCFI** → contract milestones, contractor approvals, and the **payment
+  dual-approval** risk, governed.
 
-**Talking point:** *no surprise lapses in your AI supply chain.*
+**Talking point:** *one console, one contract, multiple governed live modules.*
+
+---
+
+### 4 · Authority & a single governed action (60s)
+Go to **Decisions** → expand a flagged decision → **Approve.**
+- "Every action is **role-controlled** (RBAC) and writes a tamper-evident audit
+  event." Point to the evidence hash.
+- Note the role badge in the header — authority is explicit.
+
+**Talking point:** *who is allowed to act — and proof that they did.*
+
+---
+
+### 5 · Proof & health (50s)
+Go to **Diagnostics**.
+- "Environment mode, provider status, every module's connection, the knowledge
+  graph, and the **audit chain integrity** — one operations view."
+- Then **Settings → Audit Trail**: the hash-chained log, including the plan you
+  just executed.
+
+**Talking point:** *examination-ready by design.*
 
 ---
 
 ### Close (20s)
-> "Visibility, explainable decisions, one-click evidence, procurement readiness,
-> and vendor risk — one control plane. It runs today on demo data; for a pilot we
-> point it at your environment with the same screens. What would make this a
-> success for your team in 30 days?"
+> "Visibility, governed autonomy, organization-aware planning, role-controlled
+> authority, and provable audit — one platform. It runs today on demo data; for a
+> pilot we bind it to your environment through the same contract. What would make
+> this a success for your team in 30 days?"
 
 ---
 
-## Demo logistics
-- **Mode:** `NEXT_PUBLIC_APP_MODE=demo`, `NEXT_PUBLIC_REQUIRE_AUTH=false`.
-- **Reset:** none needed — seed data is deterministic; just reload.
-- **Theme:** toggle light/dark in the top bar if the room/projector prefers light.
-- **Fallback:** if presenting from a live DB and it's slow, flip back to demo
-  mode (see deployment.md) for a guaranteed-smooth run.
+## Logistics
+- **Mode:** demo (no credentials). Reset = reload (seed is deterministic; a cold
+  start clears in-session changes).
+- **Theme:** light/dark toggle in the header.
+- **Vertical framing:** see [pilot-briefs.md](pilot-briefs.md) for gov /
+  healthcare / finance one-pagers.
