@@ -15,6 +15,10 @@ import { timeAgo } from "@/lib/utils";
 
 export const metadata = { title: "Modules" };
 
+// Live-safe: ISR keeps live module data fresh (≤30s) without freezing it at
+// build time, while staying cached/fast in demo mode.
+export const revalidate = 30;
+
 export default async function ModulesPage() {
   const modules = await getModules();
   const stats = moduleStats(modules);

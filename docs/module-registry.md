@@ -51,13 +51,15 @@ Module commands run through the same governed pipeline (parse → RBAC → execu
 
 See [command-workspace.md](command-workspace.md).
 
-## Live binding
+## Live bindings
 
-`codex-control-plane` is the first module with a **live binding**: when
-`CODEX_CONTROL_PLANE_MODE=live` and an API URL are set, its card and detail page
-show **Connected** (or **Degraded** with seed fallback on failure); otherwise
-**Demo fallback** / **Live-ready**. See
-[live-control-plane-binding.md](live-control-plane-binding.md).
+`codex-control-plane` and `ComplianceFlow` both have **live bindings**: when
+`<MODULE>_MODE=live` and an API URL are set, the card and detail page show
+**Connected** (or **Degraded** with seed fallback on failure); otherwise **Demo
+fallback** / **Live-ready**. The registry pages are **live-safe** (ISR, 30s) so
+live data never freezes at build. See
+[live-control-plane-binding.md](live-control-plane-binding.md) and
+[live-complianceflow-binding.md](live-complianceflow-binding.md).
 
 ## Data source
 

@@ -24,10 +24,15 @@ CODEX_CONTROL_PLANE_API_KEY=             # optional bearer token
 
 ## Components
 
+As of Sprint 08 the binding logic is **shared** across modules (see
+[live-complianceflow-binding.md](live-complianceflow-binding.md)); the
+control-plane adapter is a thin wrapper.
+
 | Piece | File |
 | --- | --- |
-| Safe API client (timeout, retries, structured errors) | `lib/modules/control-plane/client.ts` |
-| Live adapter (mode + fallback + source metadata) | `lib/modules/control-plane/adapter.ts` |
+| Shared API client (timeout, retries, structured errors) | `lib/modules/live-client.ts` |
+| Shared resolver (mode + fallback + source metadata) | `lib/modules/live-adapter.ts` |
+| Control-plane adapter (thin wrapper) | `lib/modules/control-plane/adapter.ts` |
 | Registry binding | `lib/modules/registry.ts` (`getModules`/`getModule`) |
 
 ### Client safety

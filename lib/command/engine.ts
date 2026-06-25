@@ -72,6 +72,109 @@ function moduleRow(m: ModuleView): CommandRow {
   };
 }
 
+type LiveModuleKind = "sync" | "health" | "decisions" | "audit";
+interface LiveModuleSpec {
+  moduleId: string;
+  kind: LiveModuleKind;
+  envVar: string;
+}
+
+// Maps each live-module command intent to its target module + action.
+const LIVE_MODULE_COMMANDS: Record<string, LiveModuleSpec> = {
+  sync_control_plane: { moduleId: "codex-control-plane", kind: "sync", envVar: "CODEX_CONTROL_PLANE_MODE" },
+  show_control_plane_health: { moduleId: "codex-control-plane", kind: "health", envVar: "CODEX_CONTROL_PLANE_MODE" },
+  show_live_control_plane_decisions: { moduleId: "codex-control-plane", kind: "decisions", envVar: "CODEX_CONTROL_PLANE_MODE" },
+  show_control_plane_audit_events: { moduleId: "codex-control-plane", kind: "audit", envVar: "CODEX_CONTROL_PLANE_MODE" },
+  sync_complianceflow: { moduleId: "complianceflow", kind: "sync", envVar: "COMPLIANCEFLOW_MODE" },
+  show_complianceflow_health: { moduleId: "complianceflow", kind: "health", envVar: "COMPLIANCEFLOW_MODE" },
+  show_complianceflow_decisions: { moduleId: "complianceflow", kind: "decisions", envVar: "COMPLIANCEFLOW_MODE" },
+  show_complianceflow_audit_events: { moduleId: "complianceflow", kind: "audit", envVar: "COMPLIANCEFLOW_MODE" },
+};
+
+/** Shared builder for live-module commands (health/sync/decisions/audit). */
+function liveModuleCommandBody(
+  spec: LiveModuleSpec,
+  data: CommandData,
+): CommandResultBody {
+  const m = (data.modules ?? []).find((x) => x.id === spec.moduleId);
+  if (!m) {
+    return {
+      summary: `The ${spec.moduleId} module is not registered.`,
+      rows: [],
+      recommendedActions: [],
+      evidenceLinks: [],
+    };
+  }
+  const src = m.source;
+  const link = { label: `Open ${m.name}`, href: `/modules/${m.id}` };
+  const degraded = src?.connection === "degraded";
+  const provenance = src
+    ? `Source: ${src.source}${src.latencyMs != null ? ` · ${src.latencyMs}ms` : ""}${src.lastError ? ` · error: ${src.lastError}` : ""}.`
+    : "Source: seed_data.";
+
+  if (spec.kind === "decisions") {
+    return {
+      summary: `${m.decisions.length} ${m.name} decision${m.decisions.length === 1 ? "" : "s"}. ${provenance}`,
+      rows: m.decisions.map<CommandRow>((d) => ({
+        id: d.id,
+        title: d.summary,
+        subtitle: `outcome: ${d.outcome}`,
+        badge: d.riskLevel,
+        badgeStatus: d.riskLevel,
+        href: link.href,
+      })),
+      recommendedActions: [],
+      evidenceLinks: [link],
+      riskLevel: degraded ? "high" : "low",
+      source: src,
+    };
+  }
+
+  if (spec.kind === "audit") {
+    return {
+      summary: `${m.auditEvents.length} ${m.name} audit event${m.auditEvents.length === 1 ? "" : "s"}. ${provenance}`,
+      rows: m.auditEvents.map<CommandRow>((a) => ({
+        id: a.id,
+        title: a.type,
+        subtitle: a.summary,
+        href: link.href,
+      })),
+      recommendedActions: [],
+      evidenceLinks: [link],
+      riskLevel: degraded ? "high" : "low",
+      source: src,
+    };
+  }
+
+  // sync + health share a status summary.
+  const conn = src?.connection ?? "demo";
+  const summary =
+    conn === "connected"
+      ? `${m.name} is LIVE (connected). ${provenance}`
+      : conn === "degraded"
+        ? `${m.name} live sync FAILED — using seed fallback. ${provenance}`
+        : conn === "live_ready"
+          ? `${m.name} is live-ready (set ${spec.envVar}=live with an API URL). ${provenance}`
+          : `${m.name} running on demo seed data. Set ${spec.envVar}=live to connect. ${provenance}`;
+  return {
+    summary,
+    rows: [moduleRow(m)],
+    recommendedActions:
+      conn === "degraded"
+        ? [`Check the ${m.name} API URL and upstream availability.`]
+        : conn === "connected"
+          ? []
+          : [`Configure ${m.name} live binding (${spec.envVar}=live).`],
+    evidenceLinks: [link],
+    riskLevel: degraded ? "high" : "low",
+    nextStep:
+      conn === "connected"
+        ? "Live data is flowing — explore decisions and audit events."
+        : "Bind the live API to replace seed data.",
+    source: src,
+  };
+}
+
 const DAY = 86400000;
 
 export function expiringVendors(vendors: Vendor[], now: Date): Vendor[] {
@@ -465,86 +568,13 @@ export function runQuery(
     case "sync_control_plane":
     case "show_control_plane_health":
     case "show_live_control_plane_decisions":
-    case "show_control_plane_audit_events": {
-      const cp = (data.modules ?? []).find(
-        (m) => m.id === "codex-control-plane",
-      );
-      if (!cp) {
-        return {
-          summary: "The codex-control-plane module is not registered.",
-          rows: [],
-          recommendedActions: [],
-          evidenceLinks: [],
-        };
-      }
-      const src = cp.source;
-      const link = { label: "Open codex-control-plane", href: "/modules/codex-control-plane" };
-      const degraded = src?.connection === "degraded";
-      const provenance = src
-        ? `Source: ${src.source}${src.latencyMs != null ? ` · ${src.latencyMs}ms` : ""}${src.lastError ? ` · error: ${src.lastError}` : ""}.`
-        : "Source: seed_data.";
-
-      if (parsed.intent === "show_live_control_plane_decisions") {
-        return {
-          summary: `${cp.decisions.length} control-plane decision${cp.decisions.length === 1 ? "" : "s"}. ${provenance}`,
-          rows: cp.decisions.map<CommandRow>((d) => ({
-            id: d.id,
-            title: d.summary,
-            subtitle: `outcome: ${d.outcome}`,
-            badge: d.riskLevel,
-            badgeStatus: d.riskLevel,
-            href: "/modules/codex-control-plane",
-          })),
-          recommendedActions: [],
-          evidenceLinks: [link],
-          riskLevel: degraded ? "high" : "low",
-          source: src,
-        };
-      }
-
-      if (parsed.intent === "show_control_plane_audit_events") {
-        return {
-          summary: `${cp.auditEvents.length} control-plane audit event${cp.auditEvents.length === 1 ? "" : "s"}. ${provenance}`,
-          rows: cp.auditEvents.map<CommandRow>((a) => ({
-            id: a.id,
-            title: a.type,
-            subtitle: a.summary,
-            href: "/modules/codex-control-plane",
-          })),
-          recommendedActions: [],
-          evidenceLinks: [link],
-          riskLevel: degraded ? "high" : "low",
-          source: src,
-        };
-      }
-
-      // sync_control_plane + show_control_plane_health share a status summary.
-      const conn = src?.connection ?? "demo";
-      const summary =
-        conn === "connected"
-          ? `Control plane is LIVE (connected). ${provenance}`
-          : conn === "degraded"
-            ? `Control plane live sync FAILED — using seed fallback. ${provenance}`
-            : conn === "live_ready"
-              ? `Control plane is live-ready (API configured, mode=demo). ${provenance}`
-              : `Control plane running on demo seed data. Set CODEX_CONTROL_PLANE_MODE=live to connect. ${provenance}`;
-      return {
-        summary,
-        rows: [moduleRow(cp)],
-        recommendedActions:
-          conn === "degraded"
-            ? ["Check CODEX_CONTROL_PLANE_API_URL and upstream availability."]
-            : conn === "demo"
-              ? ["Configure CODEX_CONTROL_PLANE_API_URL and set mode=live."]
-              : [],
-        evidenceLinks: [link],
-        riskLevel: degraded ? "high" : "low",
-        nextStep:
-          conn === "connected"
-            ? "Live data is flowing — explore decisions and audit events."
-            : "Bind the live API to replace seed data.",
-        source: src,
-      };
+    case "show_control_plane_audit_events":
+    case "sync_complianceflow":
+    case "show_complianceflow_health":
+    case "show_complianceflow_decisions":
+    case "show_complianceflow_audit_events": {
+      const spec = LIVE_MODULE_COMMANDS[parsed.intent];
+      return liveModuleCommandBody(spec, data);
     }
 
     default:

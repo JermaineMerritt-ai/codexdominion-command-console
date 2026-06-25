@@ -29,6 +29,9 @@ const CONTRACT_CAPS = [
   "risk",
 ];
 
+// Live-safe: ISR keeps live module data fresh (≤30s) without build-time staleness.
+export const revalidate = 30;
+
 export async function generateStaticParams() {
   return (await getModules()).map((m) => ({ id: m.id }));
 }

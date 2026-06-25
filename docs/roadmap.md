@@ -47,13 +47,18 @@ First module with a live API binding through the contract, with safe seed
 fallback and source provenance. See
 [live-control-plane-binding.md](live-control-plane-binding.md).
 
+### ✅ Live-safe registry + second binding — delivered (Sprint 08)
+ISR-based live-safe `/modules`; ComplianceFlow bound as the second live module
+via shared adapter utilities. See
+[live-complianceflow-binding.md](live-complianceflow-binding.md).
+
 ### Proposed forward sequence
-- **Sprint 08** — Make `/modules` dynamic in live mode; bind a 2nd module (ComplianceFlow)
-- **Sprint 09** — Real provider integration (Claude/ChatGPT) behind the abstraction
-- **Sprint 10** — Multi-step plan execution (run each planned intent, governed)
-- **Sprint 11** — Multi-organization (tenants / workspaces)
-- **Sprint 12** — Enterprise SSO (Entra ID, Okta) + SCIM
-- **Sprint 13** — Research provider integration
+- **Sprint 09** — Bind a 3rd module (GCFI / procurement) to confirm the pattern
+- **Sprint 10** — Real provider integration (Claude/ChatGPT) behind the abstraction
+- **Sprint 11** — Multi-step plan execution (run each planned intent, governed)
+- **Sprint 12** — Multi-organization (tenants / workspaces)
+- **Sprint 13** — Enterprise SSO (Entra ID, Okta) + SCIM
+- **Sprint 14** — Research provider integration
 
 ### Original vision (reference)
 

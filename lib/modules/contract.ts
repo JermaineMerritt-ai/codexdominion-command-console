@@ -123,6 +123,36 @@ export interface ModuleRecord
   aliases: string[];
 }
 
+/** Human label for a connection state (shared by registry + detail UI). */
+export function connectionLabel(c: ModuleSource["connection"]): string {
+  switch (c) {
+    case "connected":
+      return "Live · Connected";
+    case "degraded":
+      return "Live · Degraded";
+    case "live_ready":
+      return "Live-ready";
+    default:
+      return "Demo fallback";
+  }
+}
+
+/** Badge tone for a connection state. */
+export function connectionTone(
+  c: ModuleSource["connection"],
+): "success" | "destructive" | "warning" | "neutral" {
+  switch (c) {
+    case "connected":
+      return "success";
+    case "degraded":
+      return "destructive";
+    case "live_ready":
+      return "warning";
+    default:
+      return "neutral";
+  }
+}
+
 /** Wrap a plain record as a GovernanceModule implementing the contract. */
 export function createGovernanceModule(record: ModuleRecord): GovernanceModule {
   return {

@@ -21,6 +21,10 @@ export type CommandIntent =
   | "show_control_plane_health"
   | "show_live_control_plane_decisions"
   | "show_control_plane_audit_events"
+  | "sync_complianceflow"
+  | "show_complianceflow_health"
+  | "show_complianceflow_decisions"
+  | "show_complianceflow_audit_events"
   | "unsupported";
 
 export interface IntentDefinition {
@@ -38,6 +42,34 @@ const ID_PATTERN =
 
 // Order matters: more specific intents are matched first.
 export const INTENT_DEFINITIONS: IntentDefinition[] = [
+  {
+    intent: "sync_complianceflow",
+    label: "Sync ComplianceFlow",
+    permission: "sync_complianceflow",
+    patterns: [/sync.*compliance ?flow/i, /compliance ?flow.*sync/i],
+    sample: "Sync ComplianceFlow",
+  },
+  {
+    intent: "show_complianceflow_health",
+    label: "Show ComplianceFlow health",
+    permission: "view_complianceflow",
+    patterns: [/compliance ?flow.*health/i, /health.*compliance ?flow/i],
+    sample: "Show ComplianceFlow health",
+  },
+  {
+    intent: "show_complianceflow_decisions",
+    label: "Show ComplianceFlow decisions",
+    permission: "view_complianceflow",
+    patterns: [/compliance ?flow.*decision/i],
+    sample: "Show ComplianceFlow decisions",
+  },
+  {
+    intent: "show_complianceflow_audit_events",
+    label: "Show ComplianceFlow audit events",
+    permission: "view_complianceflow",
+    patterns: [/compliance ?flow.*audit/i],
+    sample: "Show ComplianceFlow audit events",
+  },
   {
     intent: "sync_control_plane",
     label: "Sync control plane",
