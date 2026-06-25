@@ -71,6 +71,9 @@ Show modules needing integration
 Show highest risk module
 Show module status for ComplianceFlow
 Recommend next module integration
+Show control plane health
+Show live control plane decisions
+Sync control plane                             (requires admin/compliance)
 Generate evidence pack for denied decisions   (requires evidence permission)
 ```
 
@@ -94,6 +97,12 @@ codex-procurement-network, GCFI, ClinicalFlow, EscrowFlow, CareLedger, GrantOps,
 codexjustice-platform); a live module API can replace the source without changing
 the Console. See [docs/module-registry.md](docs/module-registry.md) and
 [docs/integration-contract.md](docs/integration-contract.md).
+
+**Live binding:** `codex-control-plane` is the first module that can report
+**live** data — set `CODEX_CONTROL_PLANE_MODE=live` + `CODEX_CONTROL_PLANE_API_URL`
+to connect, with automatic seed fallback if the API is unavailable (the public
+demo always shows a clear "Demo fallback" state). See
+[docs/live-control-plane-binding.md](docs/live-control-plane-binding.md).
 
 ## ⚙️ Live governance actions
 
@@ -201,10 +210,10 @@ docs/           Architecture, data model, API, deployment, roadmap
 - [Compliance Mapping](docs/compliance.md)
 - [Audit Events](docs/audit-events.md)
 - [Command Workspace](docs/command-workspace.md) · [AI Provider Routing](docs/ai-provider-routing.md)
-- [Module Registry](docs/module-registry.md) · [Integration Contract](docs/integration-contract.md)
+- [Module Registry](docs/module-registry.md) · [Integration Contract](docs/integration-contract.md) · [Live Control-Plane Binding](docs/live-control-plane-binding.md)
 - [Deployment](docs/deployment.md)
 - [Roadmap](docs/roadmap.md)
-- [Sprint 01](docs/sprint-01.md) · [02](docs/sprint-02.md) · [03](docs/sprint-03.md) · [04](docs/sprint-04.md) · [05](docs/sprint-05.md) · [06](docs/sprint-06.md)
+- [Sprint 01](docs/sprint-01.md) · [02](docs/sprint-02.md) · [03](docs/sprint-03.md) · [04](docs/sprint-04.md) · [05](docs/sprint-05.md) · [06](docs/sprint-06.md) · [07](docs/sprint-07.md)
 - [Demo Script](docs/demo-script.md)
 - [Contributing](CONTRIBUTING.md)
 

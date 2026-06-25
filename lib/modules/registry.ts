@@ -1,14 +1,21 @@
 import { modules, moduleAliases } from "@/lib/data/modules";
 import { toModuleView, type ModuleStatus, type ModuleView } from "./contract";
+import { CONTROL_PLANE_ID, loadControlPlaneView } from "./control-plane/adapter";
 
 // Module registry accessors. Demo-backed today; the Integration Contract means a
-// live module API can replace the source without changing the Console.
+// live module API can replace the source without changing the Console. The
+// codex-control-plane module resolves through its live-binding adapter.
 
 export async function getModules(): Promise<ModuleView[]> {
-  return modules.map(toModuleView);
+  return Promise.all(
+    modules.map(async (m) =>
+      m.id === CONTROL_PLANE_ID ? loadControlPlaneView() : toModuleView(m),
+    ),
+  );
 }
 
 export async function getModule(id: string): Promise<ModuleView | undefined> {
+  if (id === CONTROL_PLANE_ID) return loadControlPlaneView();
   const m = modules.find((x) => x.id === id);
   return m ? toModuleView(m) : undefined;
 }

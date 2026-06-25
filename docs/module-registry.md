@@ -51,6 +51,14 @@ Module commands run through the same governed pipeline (parse → RBAC → execu
 
 See [command-workspace.md](command-workspace.md).
 
+## Live binding
+
+`codex-control-plane` is the first module with a **live binding**: when
+`CODEX_CONTROL_PLANE_MODE=live` and an API URL are set, its card and detail page
+show **Connected** (or **Degraded** with seed fallback on failure); otherwise
+**Demo fallback** / **Live-ready**. See
+[live-control-plane-binding.md](live-control-plane-binding.md).
+
 ## Data source
 
 Demo seed: `lib/data/modules.ts`. Accessors: `lib/modules/registry.ts`. The

@@ -17,6 +17,10 @@ export type CommandIntent =
   | "show_highest_risk_module"
   | "show_module_status"
   | "recommend_next_module_integration"
+  | "sync_control_plane"
+  | "show_control_plane_health"
+  | "show_live_control_plane_decisions"
+  | "show_control_plane_audit_events"
   | "unsupported";
 
 export interface IntentDefinition {
@@ -34,6 +38,34 @@ const ID_PATTERN =
 
 // Order matters: more specific intents are matched first.
 export const INTENT_DEFINITIONS: IntentDefinition[] = [
+  {
+    intent: "sync_control_plane",
+    label: "Sync control plane",
+    permission: "sync_control_plane",
+    patterns: [/sync.*control[\s-]?plane/i, /control[\s-]?plane.*sync/i],
+    sample: "Sync control plane",
+  },
+  {
+    intent: "show_control_plane_health",
+    label: "Show control plane health",
+    permission: "view_control_plane",
+    patterns: [/control[\s-]?plane.*health/i, /health.*control[\s-]?plane/i],
+    sample: "Show control plane health",
+  },
+  {
+    intent: "show_live_control_plane_decisions",
+    label: "Show live control plane decisions",
+    permission: "view_control_plane",
+    patterns: [/control[\s-]?plane.*decision/i, /live.*decision/i],
+    sample: "Show live control plane decisions",
+  },
+  {
+    intent: "show_control_plane_audit_events",
+    label: "Show control plane audit events",
+    permission: "view_control_plane",
+    patterns: [/control[\s-]?plane.*audit/i],
+    sample: "Show control plane audit events",
+  },
   {
     intent: "explain_decision",
     label: "Explain decision",

@@ -44,9 +44,13 @@ six.
 - **Today (demo):** modules are backed by seed records
   (`lib/data/modules.ts`); `createGovernanceModule(record)` wraps a record as a
   contract implementation. No live repo/API access.
-- **Tomorrow (live):** a module's methods call its real API. **Nothing in the
-  Console changes** — the registry, detail pages, and command engine consume the
-  same contract. That is the entire point of the abstraction.
+- **Live (proven):** `codex-control-plane` already binds to a live API through
+  this contract — its adapter fetches live data into a record, wraps it with
+  `createGovernanceModule`, and falls back to seed on failure. **Nothing else in
+  the Console changes.** See
+  [live-control-plane-binding.md](live-control-plane-binding.md).
+- **Tomorrow:** the remaining modules follow the identical pattern — implement
+  the contract against the real API, point at the URL, fall back safely.
 
 ## Materialization
 

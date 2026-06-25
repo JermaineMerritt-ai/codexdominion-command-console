@@ -92,6 +92,58 @@ export default async function ModuleDetail({
         </div>
 
         <div className="space-y-4">
+          {m.source && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Connection</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Mode</span>
+                  <Badge
+                    variant={m.source.mode === "live" ? "default" : "neutral"}
+                    className="uppercase"
+                  >
+                    {m.source.mode}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Connection</span>
+                  <Badge
+                    variant={
+                      m.source.connection === "connected"
+                        ? "success"
+                        : m.source.connection === "degraded"
+                          ? "destructive"
+                          : m.source.connection === "live_ready"
+                            ? "warning"
+                            : "neutral"
+                    }
+                  >
+                    {m.source.connection.replace("_", " ")}
+                  </Badge>
+                </div>
+                <Field
+                  label="Data source"
+                  value={m.source.source.replace("_", " ")}
+                />
+                <Field
+                  label="Last successful sync"
+                  value={m.source.lastSync ? formatDateTime(m.source.lastSync) : "never"}
+                />
+                <Field
+                  label="Latency"
+                  value={m.source.latencyMs != null ? `${m.source.latencyMs} ms` : "—"}
+                />
+                {m.source.lastError && (
+                  <div className="rounded-md border border-destructive/30 bg-destructive/5 p-2 text-xs text-destructive">
+                    Last error: {m.source.lastError}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
           <Card>
             <CardHeader>
               <CardTitle>Integration Contract</CardTitle>

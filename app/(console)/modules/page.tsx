@@ -49,8 +49,29 @@ export default async function ModulesPage() {
               </p>
             </CardHeader>
             <CardContent className="flex flex-1 flex-col">
-              <div className="mb-3 flex items-center gap-2">
+              <div className="mb-3 flex flex-wrap items-center gap-2">
                 <StatusBadge status={m.health} />
+                {m.source && (
+                  <Badge
+                    variant={
+                      m.source.connection === "connected"
+                        ? "success"
+                        : m.source.connection === "degraded"
+                          ? "destructive"
+                          : m.source.connection === "live_ready"
+                            ? "warning"
+                            : "neutral"
+                    }
+                  >
+                    {m.source.connection === "connected"
+                      ? "Live · Connected"
+                      : m.source.connection === "degraded"
+                        ? "Live · Degraded"
+                        : m.source.connection === "live_ready"
+                          ? "Live-ready"
+                          : "Demo fallback"}
+                  </Badge>
+                )}
                 {m.metrics.riskFlags > 0 && (
                   <span className="inline-flex items-center gap-1 text-xs text-warning">
                     <AlertTriangle className="h-3.5 w-3.5" />

@@ -11,7 +11,9 @@ export type GovernanceAction =
   | "publish_policy"
   | "archive_policy"
   | "complete_vendor_review"
-  | "generate_evidence_pack";
+  | "generate_evidence_pack"
+  | "sync_control_plane"
+  | "view_control_plane";
 
 /** Which roles may perform each action (server-enforced, also drives the UI). */
 export const ACTION_ROLES: Record<GovernanceAction, UserRole[]> = {
@@ -22,6 +24,8 @@ export const ACTION_ROLES: Record<GovernanceAction, UserRole[]> = {
   archive_policy: ["administrator", "compliance_officer"],
   complete_vendor_review: ["administrator", "compliance_officer", "reviewer"],
   generate_evidence_pack: ["administrator", "compliance_officer", "auditor"],
+  sync_control_plane: ["administrator", "compliance_officer"],
+  view_control_plane: ["administrator", "compliance_officer", "reviewer", "auditor"],
 };
 
 export function can(role: UserRole, action: GovernanceAction): boolean {
@@ -36,6 +40,8 @@ export const ACTION_LABELS: Record<GovernanceAction, string> = {
   archive_policy: "archive policies",
   complete_vendor_review: "complete vendor reviews",
   generate_evidence_pack: "generate evidence packs",
+  sync_control_plane: "sync the control plane",
+  view_control_plane: "view live control-plane data",
 };
 
 export const ROLE_LABELS: Record<UserRole, string> = {

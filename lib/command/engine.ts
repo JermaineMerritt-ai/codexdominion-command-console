@@ -11,6 +11,7 @@ import {
   findModuleByText,
   highestRiskModule,
   nextIntegrationModule,
+  type ModuleSource,
   type ModuleView,
 } from "@/lib/modules/contract";
 
@@ -32,6 +33,8 @@ export interface CommandResultBody {
   nextStep?: string;
   /** Multi-step plan for composite commands (orchestration view). */
   plan?: string[];
+  /** Data provenance for live-module commands. */
+  source?: ModuleSource;
 }
 
 /** Full result returned to the Command Workspace UI. */
@@ -456,6 +459,91 @@ export function runQuery(
         evidenceLinks: [{ label: `Open ${m.name}`, href: `/modules/${m.id}` }],
         riskLevel: "medium",
         nextStep: step,
+      };
+    }
+
+    case "sync_control_plane":
+    case "show_control_plane_health":
+    case "show_live_control_plane_decisions":
+    case "show_control_plane_audit_events": {
+      const cp = (data.modules ?? []).find(
+        (m) => m.id === "codex-control-plane",
+      );
+      if (!cp) {
+        return {
+          summary: "The codex-control-plane module is not registered.",
+          rows: [],
+          recommendedActions: [],
+          evidenceLinks: [],
+        };
+      }
+      const src = cp.source;
+      const link = { label: "Open codex-control-plane", href: "/modules/codex-control-plane" };
+      const degraded = src?.connection === "degraded";
+      const provenance = src
+        ? `Source: ${src.source}${src.latencyMs != null ? ` · ${src.latencyMs}ms` : ""}${src.lastError ? ` · error: ${src.lastError}` : ""}.`
+        : "Source: seed_data.";
+
+      if (parsed.intent === "show_live_control_plane_decisions") {
+        return {
+          summary: `${cp.decisions.length} control-plane decision${cp.decisions.length === 1 ? "" : "s"}. ${provenance}`,
+          rows: cp.decisions.map<CommandRow>((d) => ({
+            id: d.id,
+            title: d.summary,
+            subtitle: `outcome: ${d.outcome}`,
+            badge: d.riskLevel,
+            badgeStatus: d.riskLevel,
+            href: "/modules/codex-control-plane",
+          })),
+          recommendedActions: [],
+          evidenceLinks: [link],
+          riskLevel: degraded ? "high" : "low",
+          source: src,
+        };
+      }
+
+      if (parsed.intent === "show_control_plane_audit_events") {
+        return {
+          summary: `${cp.auditEvents.length} control-plane audit event${cp.auditEvents.length === 1 ? "" : "s"}. ${provenance}`,
+          rows: cp.auditEvents.map<CommandRow>((a) => ({
+            id: a.id,
+            title: a.type,
+            subtitle: a.summary,
+            href: "/modules/codex-control-plane",
+          })),
+          recommendedActions: [],
+          evidenceLinks: [link],
+          riskLevel: degraded ? "high" : "low",
+          source: src,
+        };
+      }
+
+      // sync_control_plane + show_control_plane_health share a status summary.
+      const conn = src?.connection ?? "demo";
+      const summary =
+        conn === "connected"
+          ? `Control plane is LIVE (connected). ${provenance}`
+          : conn === "degraded"
+            ? `Control plane live sync FAILED — using seed fallback. ${provenance}`
+            : conn === "live_ready"
+              ? `Control plane is live-ready (API configured, mode=demo). ${provenance}`
+              : `Control plane running on demo seed data. Set CODEX_CONTROL_PLANE_MODE=live to connect. ${provenance}`;
+      return {
+        summary,
+        rows: [moduleRow(cp)],
+        recommendedActions:
+          conn === "degraded"
+            ? ["Check CODEX_CONTROL_PLANE_API_URL and upstream availability."]
+            : conn === "demo"
+              ? ["Configure CODEX_CONTROL_PLANE_API_URL and set mode=live."]
+              : [],
+        evidenceLinks: [link],
+        riskLevel: degraded ? "high" : "low",
+        nextStep:
+          conn === "connected"
+            ? "Live data is flowing — explore decisions and audit events."
+            : "Bind the live API to replace seed data.",
+        source: src,
       };
     }
 

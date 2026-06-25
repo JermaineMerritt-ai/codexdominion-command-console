@@ -42,13 +42,18 @@ contract; `/modules` registry + detail pages + 5 module commands. See
 [module-registry.md](module-registry.md) and
 [integration-contract.md](integration-contract.md).
 
+### ✅ Live codex-control-plane binding — delivered (Sprint 07)
+First module with a live API binding through the contract, with safe seed
+fallback and source provenance. See
+[live-control-plane-binding.md](live-control-plane-binding.md).
+
 ### Proposed forward sequence
-- **Sprint 07** — Live integration with `codex-control-plane` (first real contract binding)
-- **Sprint 08** — Real provider integration (Claude/ChatGPT) behind the abstraction
-- **Sprint 09** — Multi-step plan execution (run each planned intent, governed)
-- **Sprint 10** — Multi-organization (tenants / workspaces)
-- **Sprint 11** — Enterprise SSO (Entra ID, Okta) + SCIM
-- **Sprint 12** — Research provider integration
+- **Sprint 08** — Make `/modules` dynamic in live mode; bind a 2nd module (ComplianceFlow)
+- **Sprint 09** — Real provider integration (Claude/ChatGPT) behind the abstraction
+- **Sprint 10** — Multi-step plan execution (run each planned intent, governed)
+- **Sprint 11** — Multi-organization (tenants / workspaces)
+- **Sprint 12** — Enterprise SSO (Entra ID, Okta) + SCIM
+- **Sprint 13** — Research provider integration
 
 ### Original vision (reference)
 

@@ -63,6 +63,17 @@ the role. Unmatched accounts get least-privilege `viewer`. See
 > Middleware **fails open** if `REQUIRE_AUTH=true` but Supabase keys are missing
 > — always set the keys when enabling auth.
 
+### 6. Bind the live control plane (optional)
+```
+CODEX_CONTROL_PLANE_MODE=live
+CODEX_CONTROL_PLANE_API_URL=https://<your-control-plane>/module
+CODEX_CONTROL_PLANE_API_KEY=...    # optional
+```
+With no values set, the console runs in demo mode and the control-plane module
+shows **Demo fallback** — the public demo always works. If the live API fails,
+the module degrades to seed data automatically. See
+[live-control-plane-binding.md](live-control-plane-binding.md).
+
 ## Rollback / safety
 
 Switching `NEXT_PUBLIC_APP_MODE` back to `demo` instantly restores the

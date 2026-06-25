@@ -11,6 +11,16 @@ import type { RiskLevel } from "@/types";
 export type ModuleStatus = "active" | "planned" | "needs_integration" | "inactive";
 export type ModuleHealth = "healthy" | "degraded" | "offline" | "unknown";
 
+/** Provenance of a module's data (demo seed vs. live API). */
+export interface ModuleSource {
+  mode: "demo" | "live";
+  connection: "demo" | "live_ready" | "connected" | "degraded";
+  source: "seed_data" | "live_api" | "seed_fallback";
+  lastSync: string | null;
+  lastError: string | null;
+  latencyMs: number | null;
+}
+
 export interface ModuleMetrics {
   activeWorkflows: number;
   openDecisions: number;
@@ -99,6 +109,8 @@ export interface ModuleView {
   policies: ModulePolicyRef[];
   auditEvents: ModuleAuditRef[];
   riskItems: ModuleRiskRef[];
+  /** Data provenance (set by live-binding adapters; absent = seed). */
+  source?: ModuleSource;
 }
 
 /** The seed/record shape a module is configured with. */

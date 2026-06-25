@@ -236,6 +236,30 @@ export function CommandWorkspace({
                 </div>
               )}
 
+              {latest.source && (
+                <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <span className="font-medium text-foreground">Data source:</span>
+                  <StatusBadge
+                    status={
+                      latest.source.connection === "connected"
+                        ? "healthy"
+                        : latest.source.connection === "degraded"
+                          ? "degraded"
+                          : "unknown"
+                    }
+                  />
+                  <span>
+                    {latest.source.source} · mode {latest.source.mode}
+                    {latest.source.latencyMs != null
+                      ? ` · ${latest.source.latencyMs}ms`
+                      : ""}
+                    {latest.source.lastError
+                      ? ` · ${latest.source.lastError}`
+                      : ""}
+                  </span>
+                </div>
+              )}
+
               <div className="flex flex-wrap items-center gap-2">
                 {latest.evidenceLinks.map((l) => (
                   <Link
