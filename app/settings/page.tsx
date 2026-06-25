@@ -12,15 +12,20 @@ import { SettingsForm } from "@/components/settings/settings-form";
 import {
   getActiveOrganization,
   getAuditEvents,
-  getUserName,
+  getUsersById,
+  nameOf,
 } from "@/lib/data/queries";
 import { formatDateTime } from "@/lib/utils";
 import type { OrganizationSettings } from "@/types";
 
 export const metadata = { title: "Settings" };
 
-export default function SettingsPage() {
-  const org = getActiveOrganization();
+export default async function SettingsPage() {
+  const [org, audit, users] = await Promise.all([
+    getActiveOrganization(),
+    getAuditEvents(),
+    getUsersById(),
+  ]);
   const settings: OrganizationSettings = {
     organizationId: org.id,
     requireDualApproval: true,
@@ -30,7 +35,6 @@ export default function SettingsPage() {
     riskThreshold: 70,
     dataRegion: "us-east",
   };
-  const audit = getAuditEvents();
 
   return (
     <div>
@@ -65,7 +69,7 @@ export default function SettingsPage() {
                   </div>
                   <p className="mt-1.5 text-sm">{e.summary}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {getUserName(e.actorId)} · target {e.target}
+                    {nameOf(users, e.actorId)} · target {e.target}
                   </p>
                   <p className="mt-1 flex items-center gap-1 font-mono text-[10px] text-muted-foreground">
                     <Link2 className="h-3 w-3" />

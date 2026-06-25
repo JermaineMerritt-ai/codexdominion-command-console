@@ -28,33 +28,46 @@ import {
 import { StatusBadge } from "@/components/ui/status-badge";
 import { Progress } from "@/components/ui/progress";
 import {
-  approvalTrends,
-  decisionsOverTime,
-  policyViolations,
-  riskDistribution,
-} from "@/lib/data/seed";
-import {
   getAuditReadinessScore,
   getComplianceStatus,
   getDashboardMetrics,
+  getDashboardSeries,
   getDecisions,
   getEvidencePacks,
-  getUserName,
+  getUsersById,
   getWorkflows,
+  nameOf,
 } from "@/lib/data/queries";
 import { formatDateTime, shortHash } from "@/lib/utils";
 
 export const metadata = { title: "Dashboard" };
 
-export default function DashboardPage() {
-  const m = getDashboardMetrics();
-  const recentDecisions = getDecisions().slice(0, 5);
-  const pendingReviews = getWorkflows()
+export default async function DashboardPage() {
+  const [
+    m,
+    decisions,
+    workflows,
+    evidence,
+    readiness,
+    series,
+    users,
+  ] = await Promise.all([
+    getDashboardMetrics(),
+    getDecisions(),
+    getWorkflows(),
+    getEvidencePacks(),
+    getAuditReadinessScore(),
+    getDashboardSeries(),
+    getUsersById(),
+  ]);
+  const recentDecisions = decisions.slice(0, 5);
+  const pendingReviews = workflows
     .filter((w) => w.state === "pending_review" || w.state === "escalated")
     .slice(0, 4);
-  const recentEvidence = getEvidencePacks().slice(0, 4);
-  const readiness = getAuditReadinessScore();
+  const recentEvidence = evidence.slice(0, 4);
   const compliance = getComplianceStatus();
+  const { decisionsOverTime, policyViolations, approvalTrends, riskDistribution } =
+    series;
 
   return (
     <div>
@@ -265,7 +278,7 @@ export default function DashboardPage() {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{w.name}</p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    {w.aiSystem} · {getUserName(w.ownerId)}
+                    {w.aiSystem} · {nameOf(users, w.ownerId)}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">

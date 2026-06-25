@@ -40,17 +40,31 @@ npm run dev
 # → http://localhost:3021
 ```
 
-The console runs **zero-config**. With no environment variables it serves a rich,
-typed **seed-data layer** so every screen is immediately demoable — ideal for
-enterprise pilot demonstrations.
+The console runs **zero-config** in **DEMO mode**. With no environment variables
+it serves a rich, typed **seed-data layer** so every screen is immediately
+demoable — ideal for enterprise pilot demonstrations and public previews.
 
-### Wire up the live backend (optional)
+## 🔀 Data source modes
+
+A single switch (`NEXT_PUBLIC_APP_MODE`) selects where data comes from. Pages
+import only from `lib/data/queries.ts`, which delegates to a mode-aware
+repository — so the UI is identical in both modes.
+
+| Mode | Value | Source | Needs credentials? |
+| --- | --- | --- | --- |
+| **Demo** (default) | `demo` | typed seed layer | ❌ never breaks |
+| **Database** | `database` | Prisma + Supabase Postgres | ✅ `DATABASE_URL` etc. |
+
+**Demo is always the default**, so a credential-free Vercel preview never breaks.
+
+### Switch to database mode
 
 ```bash
 cp .env.example .env.local
-# fill in Supabase URL / keys + DATABASE_URL, then:
-npm run prisma:generate
-npm run prisma:migrate
+# set NEXT_PUBLIC_APP_MODE=database and fill in Supabase URL/keys + DATABASE_URL
+npm run db:generate     # generate the Prisma client
+npm run db:push         # or: npm run db:migrate
+npm run db:seed         # load the same governance demo records into Postgres
 ```
 
 See [docs/deployment.md](docs/deployment.md) and [docs/data-model.md](docs/data-model.md).
@@ -64,7 +78,11 @@ See [docs/deployment.md](docs/deployment.md) and [docs/data-model.md](docs/data-
 | `npm run start` | Serve the production build |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
-| `npm run prisma:migrate` | Apply Prisma migrations |
+| `npm run db:generate` | Generate the Prisma client |
+| `npm run db:push` | Push schema to the database |
+| `npm run db:migrate` | Create & apply a migration |
+| `npm run db:seed` | Seed governance demo records |
+| `npm run db:studio` | Open Prisma Studio |
 
 ## 🗂 Project structure
 
@@ -81,10 +99,15 @@ docs/           Architecture, data model, API, deployment, roadmap
 ## 📚 Documentation
 
 - [Architecture](docs/architecture.md)
+- [System Design](docs/system-design.md)
 - [Data Model](docs/data-model.md)
 - [API & Server Actions](docs/api.md)
+- [Security](docs/security.md)
+- [Compliance Mapping](docs/compliance.md)
 - [Deployment](docs/deployment.md)
 - [Roadmap](docs/roadmap.md)
+- [Sprint 01](docs/sprint-01.md)
+- [Demo Script](docs/demo-script.md)
 - [Contributing](CONTRIBUTING.md)
 
 ---

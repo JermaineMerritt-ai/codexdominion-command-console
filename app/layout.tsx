@@ -5,7 +5,7 @@ import { AppShell } from "@/components/navigation/app-shell";
 import {
   getActiveOrganization,
   getNotifications,
-  getUser,
+  getUsers,
 } from "@/lib/data/queries";
 
 export const metadata: Metadata = {
@@ -17,14 +17,18 @@ export const metadata: Metadata = {
     "The flagship AI Governance Control Plane for enterprise, healthcare, finance, and government — monitor governance, approvals, policy enforcement, compliance evidence, and vendor risk.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = getUser("usr_jmerritt")!;
-  const organization = getActiveOrganization();
-  const notifications = getNotifications();
+  const [users, organization, notifications] = await Promise.all([
+    getUsers(),
+    getActiveOrganization(),
+    getNotifications(),
+  ]);
+  const user =
+    users.find((u) => u.role === "administrator") ?? users[0];
 
   return (
     <html lang="en" suppressHydrationWarning>

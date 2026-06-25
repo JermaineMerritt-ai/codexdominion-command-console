@@ -3,19 +3,35 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
-import { globalSearch, type SearchResult } from "@/lib/data/queries";
+import { searchAction } from "@/lib/actions/search";
+import type { SearchResult } from "@/lib/data/queries";
 import { cn } from "@/lib/utils";
 
 export function GlobalSearch() {
   const router = useRouter();
   const [query, setQuery] = React.useState("");
   const [open, setOpen] = React.useState(false);
+  const [results, setResults] = React.useState<SearchResult[]>([]);
+  const [pending, setPending] = React.useState(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
-  const results: SearchResult[] = React.useMemo(
-    () => globalSearch(query),
-    [query],
-  );
+  // Debounced server-side search (mode-aware via the data layer).
+  React.useEffect(() => {
+    const q = query.trim();
+    if (!q) {
+      setResults([]);
+      return;
+    }
+    setPending(true);
+    const handle = setTimeout(async () => {
+      try {
+        setResults(await searchAction(q));
+      } finally {
+        setPending(false);
+      }
+    }, 180);
+    return () => clearTimeout(handle);
+  }, [query]);
 
   React.useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -53,7 +69,7 @@ export function GlobalSearch() {
         <div className="absolute z-50 mt-1.5 w-full overflow-hidden rounded-md border bg-card shadow-lg">
           {results.length === 0 ? (
             <p className="px-4 py-3 text-sm text-muted-foreground">
-              No results for &ldquo;{query}&rdquo;
+              {pending ? "Searching…" : `No results for “${query}”`}
             </p>
           ) : (
             <ul className="max-h-80 overflow-y-auto py-1">

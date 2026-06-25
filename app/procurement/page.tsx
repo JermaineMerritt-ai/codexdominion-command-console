@@ -20,8 +20,8 @@ function matchTone(score: number) {
   return "text-destructive";
 }
 
-export default function ProcurementPage() {
-  const opps = getOpportunities();
+export default async function ProcurementPage() {
+  const opps = await getOpportunities();
   const pipeline = opps.reduce((a, o) => a + o.estimatedValue, 0);
   const active = opps.filter((o) =>
     ["qualifying", "bid", "submitted"].includes(o.status),

@@ -9,16 +9,21 @@ import {
 import {
   getActiveOrganization,
   getDecisions,
-  getUserName,
+  getUsersById,
+  nameOf,
 } from "@/lib/data/queries";
 
 export const metadata = { title: "Decision Center" };
 
-export default function DecisionsPage() {
-  const org = getActiveOrganization();
-  const rows: DecisionRow[] = getDecisions().map((d) => ({
+export default async function DecisionsPage() {
+  const [org, decisions, users] = await Promise.all([
+    getActiveOrganization(),
+    getDecisions(),
+    getUsersById(),
+  ]);
+  const rows: DecisionRow[] = decisions.map((d) => ({
     ...d,
-    reviewerName: getUserName(d.reviewerId),
+    reviewerName: nameOf(users, d.reviewerId),
     organizationName: org.name,
   }));
 

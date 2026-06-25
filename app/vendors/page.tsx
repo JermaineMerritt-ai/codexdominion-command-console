@@ -10,7 +10,7 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { getUserName, getVendors } from "@/lib/data/queries";
+import { getUsersById, getVendors, nameOf } from "@/lib/data/queries";
 import { formatDate } from "@/lib/utils";
 import type { ComplianceState } from "@/types";
 
@@ -42,8 +42,8 @@ function isExpiringSoon(iso: string) {
   return days <= 30;
 }
 
-export default function VendorsPage() {
-  const vendors = getVendors();
+export default async function VendorsPage() {
+  const [vendors, users] = await Promise.all([getVendors(), getUsersById()]);
   const highRisk = vendors.filter((v) => v.riskScore >= 60).length;
   const expiring = vendors.filter((v) => isExpiringSoon(v.contractExpiresAt)).length;
 
@@ -89,7 +89,7 @@ export default function VendorsPage() {
                     <td className="px-5 py-3">
                       <p className="font-medium">{v.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {v.category} · {getUserName(v.ownerId)}
+                        {v.category} · {nameOf(users, v.ownerId)}
                       </p>
                     </td>
                     <td className="px-5 py-3">

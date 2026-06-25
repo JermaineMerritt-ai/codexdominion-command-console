@@ -42,8 +42,8 @@ const MATRIX: Record<UserRole, boolean[]> = {
   viewer: [true, false, false, false, false],
 };
 
-export default function UsersPage() {
-  const users = getUsers();
+export default async function UsersPage() {
+  const users = await getUsers();
 
   return (
     <div>

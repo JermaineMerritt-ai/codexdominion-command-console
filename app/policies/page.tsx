@@ -4,13 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { getPolicies, getUserName } from "@/lib/data/queries";
+import { getPolicies, getUsersById, nameOf } from "@/lib/data/queries";
 import { formatDate } from "@/lib/utils";
 
 export const metadata = { title: "Policies" };
 
-export default function PoliciesPage() {
-  const policies = getPolicies();
+export default async function PoliciesPage() {
+  const [policies, users] = await Promise.all([
+    getPolicies(),
+    getUsersById(),
+  ]);
   const published = policies.filter((p) => p.status === "published").length;
   const draft = policies.filter((p) => p.status === "draft").length;
 
@@ -63,7 +66,7 @@ export default function PoliciesPage() {
                   </td>
                   <td className="px-5 py-3 font-mono text-xs">{p.version}</td>
                   <td className="px-5 py-3 text-muted-foreground">
-                    {getUserName(p.ownerId)}
+                    {nameOf(users, p.ownerId)}
                   </td>
                   <td className="px-5 py-3 tabular-nums">{p.rulesCount}</td>
                   <td className="px-5 py-3">

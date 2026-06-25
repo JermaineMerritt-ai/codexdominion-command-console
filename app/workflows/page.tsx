@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { getUserName, getWorkflows } from "@/lib/data/queries";
+import { getUsersById, getWorkflows, nameOf } from "@/lib/data/queries";
 import { formatDateTime } from "@/lib/utils";
 import type { WorkflowState } from "@/types";
 
@@ -29,8 +29,11 @@ const STATE_ORDER: (WorkflowState | "created")[] = [
   "closed",
 ];
 
-export default function WorkflowsPage() {
-  const workflows = getWorkflows();
+export default async function WorkflowsPage() {
+  const [workflows, users] = await Promise.all([
+    getWorkflows(),
+    getUsersById(),
+  ]);
   const counts = {
     active: workflows.filter(
       (w) => w.state === "pending_review" || w.state === "escalated",
@@ -61,7 +64,7 @@ export default function WorkflowsPage() {
               <div>
                 <CardTitle className="text-base">{w.name}</CardTitle>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {w.aiSystem} · Owner {getUserName(w.ownerId)}
+                  {w.aiSystem} · Owner {nameOf(users, w.ownerId)}
                 </p>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1.5">
@@ -122,7 +125,7 @@ export default function WorkflowsPage() {
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {getUserName(e.actorId)}
+                      {nameOf(users, e.actorId)}
                       {e.note ? ` — ${e.note}` : ""}
                     </p>
                   </li>

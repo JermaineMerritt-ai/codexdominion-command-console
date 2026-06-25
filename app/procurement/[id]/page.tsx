@@ -22,8 +22,8 @@ import { Progress } from "@/components/ui/progress";
 import { getOpportunities, getOpportunity } from "@/lib/data/queries";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
-export function generateStaticParams() {
-  return getOpportunities().map((o) => ({ id: o.id }));
+export async function generateStaticParams() {
+  return (await getOpportunities()).map((o) => ({ id: o.id }));
 }
 
 export default async function OpportunityDetail({
@@ -32,7 +32,7 @@ export default async function OpportunityDetail({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const o = getOpportunity(id);
+  const o = await getOpportunity(id);
   if (!o) notFound();
 
   const readiness = Math.max(

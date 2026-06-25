@@ -13,7 +13,8 @@ import { PackDownload } from "@/components/evidence/pack-download";
 import {
   getDecisions,
   getEvidencePacks,
-  getUserName,
+  getUsersById,
+  nameOf,
 } from "@/lib/data/queries";
 import { formatDateTime, shortHash } from "@/lib/utils";
 
@@ -21,9 +22,13 @@ export const metadata = { title: "Evidence" };
 
 const FORMAT_ICON = { JSON: FileJson, PDF: FileText, ZIP: FileArchive };
 
-export default function EvidencePage() {
-  const packs = getEvidencePacks();
-  const decisions = getDecisions().map((d) => ({
+export default async function EvidencePage() {
+  const [packs, allDecisions, users] = await Promise.all([
+    getEvidencePacks(),
+    getDecisions(),
+    getUsersById(),
+  ]);
+  const decisions = allDecisions.map((d) => ({
     id: d.id,
     aiSystem: d.aiSystem,
     policyRule: d.policyRule,
@@ -68,7 +73,7 @@ export default function EvidencePage() {
               <div className="min-w-0">
                 <CardTitle className="text-base">{p.title}</CardTitle>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  {p.id} · {getUserName(p.responsibleUserId)}
+                  {p.id} · {nameOf(users, p.responsibleUserId)}
                 </p>
               </div>
               <StatusBadge status={p.status} />
